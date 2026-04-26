@@ -1,0 +1,561 @@
+openapi: 3.0.3
+info:
+  title: Prompt Version Control API
+  description: Git-like versioning for prompts with eval-gated promotion
+  version: 0.1.0
+  contact:
+    name: Reaa
+    url: https://github.com/reaatech/prompt-version-control
+servers:
+  - url: http://localhost:3000/api/v1
+    description: Local development
+paths:
+  /health:
+    get:
+      summary: Health check
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status: { type: string }
+                  timestamp: { type: string, format: date-time }
+  /ready:
+    get:
+      summary: Readiness check
+      responses:
+        '200':
+          description: Ready
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status: { type: string }
+  /prompts:
+    get:
+      summary: List prompts
+      security: [{ BearerAuth: [] }]
+      parameters:
+        - in: query
+          name: limit
+          schema: { type: integer, default: 20 }
+        - in: query
+          name: cursor
+          schema: { type: string }
+      responses:
+        '200':
+          description: Paginated list of prompts
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data: { type: array, items: { $ref: '#/components/schemas/Prompt' } }
+                  meta: { $ref: '#/components/schemas/PaginationMeta' }
+    post:
+      summary: Create a prompt
+      security: [{ BearerAuth: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/CreatePromptInput' }
+      responses:
+        '201':
+          description: Created prompt
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Prompt' }
+  /prompts/{id}:
+    get:
+      summary: Get a prompt
+      security: [{ BearerAuth: [] }]
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: string }
+      responses:
+        '200':
+          description: Prompt details
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Prompt' }
+    put:
+      summary: Update a prompt
+      security: [{ BearerAuth: [] }]
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: string }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/UpdatePromptInput' }
+      responses:
+        '200':
+          description: Updated prompt
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Prompt' }
+    delete:
+      summary: Archive a prompt
+      security: [{ BearerAuth: [] }]
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: string }
+      responses:
+        '200':
+          description: Archived prompt
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Prompt' }
+  /prompts/{id}/versions:
+    get:
+      summary: List versions
+      security: [{ BearerAuth: [] }]
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: string }
+        - in: query
+          name: limit
+          schema: { type: integer, default: 20 }
+        - in: query
+          name: cursor
+          schema: { type: string }
+      responses:
+        '200':
+          description: Paginated list of versions
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data: { type: array, items: { $ref: '#/components/schemas/Version' } }
+                  meta: { $ref: '#/components/schemas/PaginationMeta' }
+    post:
+      summary: Create a version
+      security: [{ BearerAuth: [] }]
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: string }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/CreateVersionInput' }
+      responses:
+        '201':
+          description: Created version
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Version' }
+  /prompts/{id}/production:
+    get:
+      summary: Get production version
+      security: [{ BearerAuth: [] }]
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: string }
+      responses:
+        '200':
+          description: Production version
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Version' }
+  /prompts/{id}/diff:
+    get:
+      summary: Diff two versions
+      security: [{ BearerAuth: [] }]
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: string }
+        - in: query
+          name: fromVersion
+          required: true
+          schema: { type: integer }
+        - in: query
+          name: toVersion
+          required: true
+          schema: { type: integer }
+      responses:
+        '200':
+          description: Diff result
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/DiffResult' }
+  /evaluations/trigger:
+    post:
+      summary: Trigger an evaluation
+      security: [{ BearerAuth: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                versionId: { type: string }
+                harnessId: { type: string, default: default }
+      responses:
+        '201':
+          description: Evaluation triggered
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Evaluation' }
+  /evaluations/webhook:
+    post:
+      summary: Receive eval harness webhook
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                harnessId: { type: string }
+                status: { type: string, enum: [pending, running, passed, failed, error] }
+                score: { type: number }
+                metrics: { type: object }
+      responses:
+        '200':
+          description: Webhook processed
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Evaluation' }
+  /evaluations/versions/{versionId}:
+    get:
+      summary: List evaluations for a version
+      security: [{ BearerAuth: [] }]
+      parameters:
+        - in: path
+          name: versionId
+          required: true
+          schema: { type: string }
+      responses:
+        '200':
+          description: List of evaluations
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data: { type: array, items: { $ref: '#/components/schemas/Evaluation' } }
+  /evaluations/versions/{versionId}/gate:
+    get:
+      summary: Check promotion gate
+      security: [{ BearerAuth: [] }]
+      parameters:
+        - in: path
+          name: versionId
+          required: true
+          schema: { type: string }
+      responses:
+        '200':
+          description: Promotion gate status
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  canPromote: { type: boolean }
+                  reason: { type: string }
+                  evaluations: { type: array, items: { $ref: '#/components/schemas/Evaluation' } }
+  /deployments:
+    get:
+      summary: List deployments
+      security: [{ BearerAuth: [] }]
+      parameters:
+        - in: query
+          name: promptId
+          schema: { type: string }
+      responses:
+        '200':
+          description: List of deployments
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data: { type: array, items: { $ref: '#/components/schemas/Deployment' } }
+    post:
+      summary: Create a deployment
+      security: [{ BearerAuth: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/CreateDeploymentInput' }
+      responses:
+        '201':
+          description: Created deployment
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Deployment' }
+  /deployments/{id}/resolve:
+    get:
+      summary: Resolve version for a deployment
+      security: [{ BearerAuth: [] }]
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: string }
+        - in: query
+          name: sessionId
+          schema: { type: string }
+      responses:
+        '200':
+          description: Resolved version
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  versionId: { type: string }
+                  sessionId: { type: string }
+  /deployments/{id}:
+    put:
+      summary: Update deployment status
+      security: [{ BearerAuth: [] }]
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: string }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                status: { type: string, enum: [active, paused, archived] }
+      responses:
+        '200':
+          description: Updated deployment
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Deployment' }
+  /metrics/ingest:
+    post:
+      summary: Ingest metrics
+      security: [{ BearerAuth: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                metrics: { type: array, items: { $ref: '#/components/schemas/MetricInput' } }
+      responses:
+        '201':
+          description: Metrics ingested
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ingested: { type: integer }
+  /metrics/versions/{versionId}:
+    get:
+      summary: Get metrics for a version
+      security: [{ BearerAuth: [] }]
+      parameters:
+        - in: path
+          name: versionId
+          required: true
+          schema: { type: string }
+        - in: query
+          name: hours
+          schema: { type: integer }
+      responses:
+        '200':
+          description: Metrics list
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data: { type: array, items: { $ref: '#/components/schemas/Metric' } }
+  /metrics/prompts/{promptId}:
+    get:
+      summary: Get metrics for a prompt
+      security: [{ BearerAuth: [] }]
+      parameters:
+        - in: path
+          name: promptId
+          required: true
+          schema: { type: string }
+        - in: query
+          name: hours
+          schema: { type: integer }
+      responses:
+        '200':
+          description: Metrics list
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data: { type: array, items: { $ref: '#/components/schemas/Metric' } }
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: API key
+  schemas:
+    Prompt:
+      type: object
+      properties:
+        id: { type: string }
+        projectId: { type: string }
+        name: { type: string }
+        description: { type: string, nullable: true }
+        template: { type: string }
+        variables: { type: object }
+        metadata: { type: object, nullable: true }
+        archived: { type: boolean }
+        createdAt: { type: string, format: date-time }
+        updatedAt: { type: string, format: date-time }
+    CreatePromptInput:
+      type: object
+      required: [name, template]
+      properties:
+        name: { type: string, pattern: '^[a-z0-9-]+$' }
+        template: { type: string }
+        description: { type: string }
+        variables: { type: object }
+        metadata: { type: object }
+    UpdatePromptInput:
+      type: object
+      properties:
+        template: { type: string }
+        description: { type: string }
+        variables: { type: object }
+        metadata: { type: object }
+    Version:
+      type: object
+      properties:
+        id: { type: string }
+        promptId: { type: string }
+        number: { type: integer }
+        content: { type: string }
+        template: { type: string }
+        variables: { type: object }
+        checksum: { type: string }
+        metadata: { type: object, nullable: true }
+        createdAt: { type: string, format: date-time }
+    CreateVersionInput:
+      type: object
+      required: [content, template]
+      properties:
+        content: { type: string }
+        template: { type: string }
+        variables: { type: object }
+        metadata: { type: object }
+    DiffResult:
+      type: object
+      properties:
+        fromVersion: { type: integer }
+        toVersion: { type: integer }
+        sections:
+          type: array
+          items:
+            type: object
+            properties:
+              type: { type: string, enum: [added, removed, modified] }
+              value: { type: string }
+              lineStart: { type: integer }
+              lineEnd: { type: integer }
+        semanticImpact: { type: string, enum: [none, minor, major] }
+    Evaluation:
+      type: object
+      properties:
+        id: { type: string }
+        versionId: { type: string }
+        harnessId: { type: string }
+        status: { type: string, enum: [pending, running, passed, failed, error] }
+        score: { type: number, nullable: true }
+        metrics: { type: object, nullable: true }
+        startedAt: { type: string, format: date-time, nullable: true }
+        completedAt: { type: string, format: date-time, nullable: true }
+        createdAt: { type: string, format: date-time }
+    Deployment:
+      type: object
+      properties:
+        id: { type: string }
+        projectId: { type: string }
+        promptId: { type: string }
+        name: { type: string }
+        status: { type: string, enum: [active, paused, archived] }
+        config: { type: object }
+        variants:
+          type: array
+          items:
+            type: object
+            properties:
+              versionId: { type: string }
+              weight: { type: integer }
+              isControl: { type: boolean }
+        createdAt: { type: string, format: date-time }
+    CreateDeploymentInput:
+      type: object
+      required: [promptId, name, variants]
+      properties:
+        promptId: { type: string }
+        name: { type: string }
+        variants:
+          type: array
+          items:
+            type: object
+            properties:
+              versionId: { type: string }
+              weight: { type: integer }
+              isControl: { type: boolean }
+    Metric:
+      type: object
+      properties:
+        id: { type: string }
+        versionId: { type: string }
+        type: { type: string, enum: [cost, latency, quality] }
+        name: { type: string }
+        value: { type: number }
+        unit: { type: string }
+        timestamp: { type: string, format: date-time }
+        dimensions: { type: object, nullable: true }
+    MetricInput:
+      type: object
+      required: [versionId, type, name, value, unit]
+      properties:
+        versionId: { type: string }
+        type: { type: string, enum: [cost, latency, quality] }
+        name: { type: string }
+        value: { type: number }
+        unit: { type: string }
+        timestamp: { type: string, format: date-time }
+        dimensions: { type: object }
+    PaginationMeta:
+      type: object
+      properties:
+        limit: { type: integer }
+        nextCursor: { type: string }
+        total: { type: integer }
