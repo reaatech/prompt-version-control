@@ -1,0 +1,56 @@
+{
+  "name": "@pvc/shared",
+  "version": "0.1.0",
+  "description": "Shared types, schemas, and utilities for Prompt Version Control",
+  "license": "MIT",
+  "author": "Rick Somers <rick@reaatech.com> (https://reaatech.com)",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/reaatech/prompt-version-control.git",
+    "directory": "packages/shared"
+  },
+  "bugs": {
+    "url": "https://github.com/reaatech/prompt-version-control/issues"
+  },
+  "homepage": "https://github.com/reaatech/prompt-version-control/tree/main/packages/shared#readme",
+  "keywords": [
+    "prompt",
+    "version-control",
+    "types",
+    "schemas"
+  ],
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    },
+    "./types": {
+      "import": "./dist/types/index.js",
+      "types": "./dist/types/index.d.ts"
+    },
+    "./schemas": {
+      "import": "./dist/schemas/index.js",
+      "types": "./dist/schemas/index.d.ts"
+    }
+  },
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint src/",
+    "lint:fix": "eslint src/ --fix",
+    "test": "vitest run",
+    "test:coverage": "vitest run --coverage"
+  },
+  "dependencies": {
+    "handlebars": "^4.7.8",
+    "zod": "^3.23.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.4.0",
+    "vitest": "^2.0.0"
+  }
+}
