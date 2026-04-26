@@ -1,0 +1,48 @@
+{
+  "name": "@pvc/sdk",
+  "version": "0.1.0",
+  "description": "Prompt Version Control TypeScript SDK",
+  "license": "MIT",
+  "author": "Rick Somers <rick@reaatech.com> (https://reaatech.com)",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/reaatech/prompt-version-control.git",
+    "directory": "packages/sdk"
+  },
+  "bugs": {
+    "url": "https://github.com/reaatech/prompt-version-control/issues"
+  },
+  "homepage": "https://github.com/reaatech/prompt-version-control/tree/main/packages/sdk#readme",
+  "keywords": [
+    "prompt",
+    "version-control",
+    "sdk",
+    "typescript"
+  ],
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint src/",
+    "lint:fix": "eslint src/ --fix",
+    "test": "vitest run",
+    "test:coverage": "vitest run --coverage"
+  },
+  "dependencies": {
+    "@pvc/shared": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "typescript": "^5.4.0",
+    "vitest": "^2.0.0"
+  }
+}
