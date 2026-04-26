@@ -1,0 +1,167 @@
+# Default values for pvc.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+replicaCount: 2
+
+image:
+  repository: ghcr.io/reaatech/prompt-version-control/server
+  tag: 'latest'
+  pullPolicy: IfNotPresent
+
+imagePullSecrets: []
+
+nameOverride: ''
+fullnameOverride: ''
+
+serviceAccount:
+  # Specifies whether a service account should be created
+  create: true
+  # Annotations to add to the service account
+  annotations: {}
+  # The name of the service account to use.
+  # If not set and create is true, a name is generated using the fullname template
+  name: ''
+
+podAnnotations: {}
+
+podSecurityContext:
+  runAsNonRoot: true
+  runAsUser: 1000
+  runAsGroup: 1000
+  fsGroup: 1000
+  seccompProfile:
+    type: RuntimeDefault
+
+securityContext:
+  allowPrivilegeEscalation: false
+  readOnlyRootFilesystem: true
+  capabilities:
+    drop:
+      - ALL
+
+service:
+  type: ClusterIP
+  port: 3000
+
+ingress:
+  enabled: false
+  className: nginx
+  annotations:
+    nginx.ingress.kubernetes.io/ssl-redirect: 'true'
+  hosts:
+    - host: pvc.example.com
+      paths:
+        - path: /
+          pathType: Prefix
+  tls:
+    - secretName: pvc-tls-secret
+      hosts:
+        - pvc.example.com
+
+resources:
+  limits:
+    cpu: 500m
+    memory: 512Mi
+  requests:
+    cpu: 250m
+    memory: 256Mi
+
+autoscaling:
+  enabled: false
+  minReplicas: 2
+  maxReplicas: 10
+  targetCPUUtilizationPercentage: 70
+  targetMemoryUtilizationPercentage: 80
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}
+
+# ---------------------------------------------------------------------------
+# PostgreSQL subchart-style configuration
+# ---------------------------------------------------------------------------
+postgresql:
+  enabled: true
+  image:
+    repository: postgres
+    tag: 16-alpine
+    pullPolicy: IfNotPresent
+  auth:
+    username: 'postgres'
+    # password and database should be provided at deploy time
+    password: ''
+    database: 'pvc'
+  persistence:
+    enabled: true
+    size: 1Gi
+    storageClass: ''
+  resources:
+    limits:
+      cpu: 500m
+      memory: 512Mi
+    requests:
+      cpu: 250m
+      memory: 256Mi
+  securityContext:
+    runAsNonRoot: true
+    runAsUser: 999
+    runAsGroup: 999
+    fsGroup: 999
+    seccompProfile:
+      type: RuntimeDefault
+
+# ---------------------------------------------------------------------------
+# Redis subchart-style configuration
+# ---------------------------------------------------------------------------
+redis:
+  enabled: true
+  image:
+    repository: redis
+    tag: 7-alpine
+    pullPolicy: IfNotPresent
+  auth:
+    enabled: true
+    # password should be provided at deploy time
+    password: ''
+  persistence:
+    enabled: true
+    size: 1Gi
+    storageClass: ''
+  resources:
+    limits:
+      cpu: 250m
+      memory: 256Mi
+    requests:
+      cpu: 100m
+      memory: 128Mi
+  securityContext:
+    runAsNonRoot: true
+    runAsUser: 999
+    runAsGroup: 999
+    fsGroup: 999
+    seccompProfile:
+      type: RuntimeDefault
+
+# ---------------------------------------------------------------------------
+# Environment variables exposed via ConfigMap
+# ---------------------------------------------------------------------------
+env:
+  NODE_ENV: production
+  PORT: '3000'
+  LOG_LEVEL: info
+
+# ---------------------------------------------------------------------------
+# Sensitive values exposed via Secret
+# ---------------------------------------------------------------------------
+# DO NOT commit real secrets to git. Provide them at deploy time via:
+#   helm install pvc ./pvc --set secrets.JWT_SECRET=xxx ...
+# or use an external secret management tool.
+secrets:
+  # JWT_SECRET: ""
+  # EVAL_WEBHOOK_SECRET: ""
+  # API_KEY_PEPPER: ""
+  # DATABASE_URL: ""
+  # REDIS_PASSWORD: ""

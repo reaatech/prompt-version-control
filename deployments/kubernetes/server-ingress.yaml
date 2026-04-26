@@ -1,0 +1,27 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: pvc-server
+  namespace: pvc
+  labels:
+    app.kubernetes.io/name: prompt-version-control
+    app.kubernetes.io/component: server
+  annotations:
+    nginx.ingress.kubernetes.io/ssl-redirect: 'true'
+spec:
+  ingressClassName: nginx
+  tls:
+    - hosts:
+        - pvc.example.com
+      secretName: pvc-tls-secret
+  rules:
+    - host: pvc.example.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: pvc-server
+                port:
+                  number: 3000

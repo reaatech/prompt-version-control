@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: pvc-config
+  namespace: pvc
+  labels:
+    app.kubernetes.io/name: prompt-version-control
+    app.kubernetes.io/component: server
+data:
+  NODE_ENV: 'production'
+  PORT: '3000'
+  LOG_LEVEL: 'info'
+  # DATABASE_URL and REDIS_URL come from the Secret — see server-deployment.yaml.

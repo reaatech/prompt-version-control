@@ -1,0 +1,15 @@
+apiVersion: v2
+name: pvc
+description: A Helm chart for the Prompt Version Control stack
+version: 0.1.0
+appVersion: 'latest'
+keywords:
+  - prompt-version-control
+  - pvc
+  - hono
+home: https://github.com/reaatech/prompt-version-control
+sources:
+  - https://github.com/reaatech/prompt-version-control
+maintainers:
+  - name: ReaaTech
+    email: ops@reaatech.io
