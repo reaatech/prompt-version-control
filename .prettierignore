@@ -1,0 +1,11 @@
+# Dependencies & build outputs
+node_modules/
+dist/
+.turbo/
+coverage/
+
+# Generated lockfiles
+pnpm-lock.yaml
+
+# Helm templates aren't valid YAML (Go template syntax) — let helm lint them instead.
+deployments/helm/**/templates/
