@@ -1,0 +1,60 @@
+{
+  "name": "@pvc/server",
+  "version": "0.1.0",
+  "description": "Prompt Version Control API server",
+  "license": "MIT",
+  "author": "Rick Somers <rick@reaatech.com> (https://reaatech.com)",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/reaatech/prompt-version-control.git",
+    "directory": "packages/server"
+  },
+  "bugs": {
+    "url": "https://github.com/reaatech/prompt-version-control/issues"
+  },
+  "homepage": "https://github.com/reaatech/prompt-version-control/tree/main/packages/server#readme",
+  "keywords": [
+    "prompt",
+    "version-control",
+    "api",
+    "hono",
+    "prisma"
+  ],
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsx watch src/index.ts",
+    "start": "node dist/index.js",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint src/",
+    "lint:fix": "eslint src/ --fix",
+    "test": "vitest run",
+    "test:coverage": "vitest run --coverage",
+    "db:generate": "prisma generate",
+    "db:migrate": "prisma migrate dev",
+    "db:migrate:prod": "prisma migrate deploy",
+    "db:seed": "tsx prisma/seed.ts",
+    "db:studio": "prisma studio"
+  },
+  "dependencies": {
+    "@hono/node-server": "^1.11.0",
+    "@hono/zod-validator": "^0.2.0",
+    "@prisma/client": "^5.15.0",
+    "@pvc/shared": "workspace:*",
+    "hono": "^4.4.0",
+    "ioredis": "^5.4.0",
+    "pino": "^9.0.0",
+    "pino-pretty": "^11.0.0",
+    "prom-client": "^15.0.0",
+    "zod": "^3.23.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "prisma": "^5.15.0",
+    "tsx": "^4.0.0",
+    "typescript": "^5.4.0",
+    "vitest": "^2.0.0"
+  }
+}

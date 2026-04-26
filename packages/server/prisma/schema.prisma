@@ -1,0 +1,229 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Project {
+  id          String    @id @default(cuid())
+  name        String
+  slug        String    @unique
+  settings    Json?     // Project-level configuration (eval thresholds, etc.)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  prompts     Prompt[]
+  apiKeys     ApiKey[]
+  members     ProjectMember[]
+  tags        Tag[]
+  deployments Deployment[]
+  webhooks    WebhookSubscription[]
+}
+
+model Prompt {
+  id          String    @id @default(cuid())
+  projectId   String
+  name        String
+  description String?
+  template    String    // Current template schema (e.g., "Hello {{name}}")
+  variables   Json      // Variable schema: { "name": "string", "tone": "enum:formal|casual" }
+  metadata    Json?     // Custom metadata (category, owner, etc.)
+  archived    Boolean   @default(false)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  project     Project   @relation(fields: [projectId], references: [id])
+  versions    Version[]
+  tags        Tag[]
+  deployments Deployment[]
+
+  @@index([projectId, archived])
+  @@unique([projectId, name])
+}
+
+model Version {
+  id          String    @id @default(cuid())
+  promptId    String
+  number      Int       // Sequential version number (auto-incremented per prompt)
+  content     String    // Actual prompt content (the raw text used at inference time)
+  template    String    // Template snapshot at time of version creation
+  variables   Json      // Variable snapshot: values or schema used for this version
+  checksum    String    // SHA256 of content for deduplication
+  metadata    Json?     // Author, change reason, source commit, etc.
+  createdAt   DateTime  @default(now())
+
+  prompt      Prompt    @relation(fields: [promptId], references: [id])
+  evaluations Evaluation[]
+  metrics     Metric[]
+  tags        Tag[]
+  deploymentVariants DeploymentVariant[]
+
+  @@unique([promptId, number])
+  @@index([promptId, createdAt])
+}
+
+model Tag {
+  id        String   @id @default(cuid())
+  projectId String   // Denormalized for fast auth checks
+  promptId  String   // The prompt this tag belongs to
+  versionId String   // The version this tag points to (always set in MVP)
+  name      String   // draft, staging, production
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  project   Project  @relation(fields: [projectId], references: [id])
+  prompt    Prompt   @relation(fields: [promptId], references: [id])
+  version   Version  @relation(fields: [versionId], references: [id])
+
+  // Only one version per prompt can hold a given tag at a time
+  @@unique([promptId, name])
+  @@index([projectId, name])
+}
+
+model Evaluation {
+  id          String    @id @default(cuid())
+  versionId   String
+  harnessId   String    // External eval harness ID
+  status      EvalStatus // pending, running, passed, failed, error
+  score       Float?
+  metrics     Json?     // Detailed metrics from eval
+  startedAt   DateTime?
+  completedAt DateTime?
+  createdAt   DateTime  @default(now())
+
+  version     Version   @relation(fields: [versionId], references: [id])
+
+  @@index([versionId, status])
+  @@index([harnessId])
+}
+
+model Deployment {
+  id          String    @id @default(cuid())
+  projectId   String
+  promptId    String
+  name        String
+  status      DeploymentStatus // active, paused, archived
+  config      Json    // Traffic split config, sticky session settings
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  project     Project   @relation(fields: [projectId], references: [id])
+  prompt      Prompt    @relation(fields: [promptId], references: [id])
+  variants    DeploymentVariant[]
+
+  @@index([projectId, status])
+}
+
+model DeploymentVariant {
+  id          String    @id @default(cuid())
+  deploymentId String
+  versionId   String
+  weight      Int       // 0-100 percentage
+  isControl   Boolean   @default(false)
+
+  deployment  Deployment @relation(fields: [deploymentId], references: [id])
+  version     Version    @relation(fields: [versionId], references: [id])
+
+  @@unique([deploymentId, versionId])
+}
+
+model Metric {
+  id          String    @id @default(cuid())
+  versionId   String
+  type        MetricType // cost, latency, quality
+  name        String    // metric name
+  value       Float
+  unit        String    // usd, ms, score
+  timestamp   DateTime  @default(now())
+  dimensions  Json?     // Additional dimensions
+
+  version     Version   @relation(fields: [versionId], references: [id])
+
+  @@index([versionId, type, timestamp])
+  @@index([timestamp])
+}
+
+model ProjectMember {
+  id        String   @id @default(cuid())
+  projectId String
+  userId    String   // External user ID from auth provider
+  email     String
+  role      String   // admin, editor, viewer
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  project   Project  @relation(fields: [projectId], references: [id])
+
+  @@unique([projectId, userId])
+}
+
+model AuditLog {
+  id           String   @id @default(cuid())
+  actorId      String
+  action       String
+  resourceType String
+  resourceId   String
+  projectId    String
+  before       Json?
+  after        Json?
+  ipAddress    String?
+  requestId    String?
+  createdAt    DateTime @default(now())
+
+  @@index([projectId, createdAt])
+  @@index([resourceType, resourceId])
+}
+
+model WebhookSubscription {
+  id        String   @id @default(cuid())
+  projectId String
+  url       String
+  events    String[] // EventType array
+  secret    String
+  active    Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  project   Project  @relation(fields: [projectId], references: [id])
+
+  @@index([projectId, active])
+}
+
+model ApiKey {
+  id          String    @id @default(cuid())
+  projectId   String
+  name        String
+  keyHash     String    // Hashed key (bcrypt/argon2)
+  prefix      String    // First 8 chars for identification
+  permissions Json      // Permission set
+  lastUsedAt  DateTime?
+  expiresAt   DateTime?
+  createdAt   DateTime  @default(now())
+
+  project     Project   @relation(fields: [projectId], references: [id])
+
+  @@unique([keyHash])
+  @@index([projectId, prefix])
+}
+
+enum EvalStatus {
+  pending
+  running
+  passed
+  failed
+  error
+}
+
+enum DeploymentStatus {
+  active
+  paused
+  archived
+}
+
+enum MetricType {
+  cost
+  latency
+  quality
+}
