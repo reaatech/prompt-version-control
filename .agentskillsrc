@@ -1,0 +1,117 @@
+{
+  "$schema": "./skills/schema.json",
+  "code-generation": {
+    "style": "functional",
+    "patterns": ["repository", "service", "controller"],
+    "exclude": [
+      "**/*.test.ts",
+      "**/*.d.ts",
+      "**/node_modules/**",
+      "**/dist/**"
+    ],
+    "templates": {
+      "api": "packages/server/src/api/routes/{entity}.routes.ts",
+      "service": "packages/server/src/services/{entity}.service.ts",
+      "repository": "packages/server/src/repositories/{entity}.repository.ts",
+      "schema": "packages/server/src/schemas/{entity}.schema.ts",
+      "cli": "packages/cli/src/commands/{entity}/{action}.ts"
+    }
+  },
+  "test-generation": {
+    "framework": "vitest",
+    "coverage": {
+      "threshold": 85,
+      "include": ["packages/*/src/**/*.ts"],
+      "exclude": [
+        "packages/*/src/**/*.d.ts",
+        "packages/*/src/**/index.ts",
+        "packages/*/src/test-utils/**",
+        "packages/*/src/**/__tests__/**",
+        "packages/*/src/**/__mocks__/**"
+      ]
+    },
+    "testLocation": "parallel",
+    "mockStrategy": "auto"
+  },
+  "documentation": {
+    "format": "markdown",
+    "autoGenerate": true,
+    "includeDiagrams": true,
+    "outputPaths": {
+      "api": "docs/api/",
+      "cli": "docs/cli/",
+      "architecture": "docs/architecture/"
+    }
+  },
+  "code-review": {
+    "strict": false,
+    "output": "text",
+    "rules": {
+      "security": {
+        "sqlInjection": "error",
+        "xssPrevention": "error",
+        "apiKeyHandling": "error",
+        "inputValidation": "error"
+      },
+      "typescript": {
+        "noImplicitAny": "error",
+        "strictNullChecks": "error",
+        "noUnsafeAny": "warn"
+      },
+      "performance": {
+        "nPlus1Queries": "warn",
+        "missingIndexes": "warn",
+        "largePayloads": "info"
+      },
+      "codeQuality": {
+        "functionComplexity": {
+          "level": "warn",
+          "maxLines": 50
+        },
+        "magicNumbers": "info",
+        "codeDuplication": "warn"
+      }
+    }
+  },
+  "migration": {
+    "database": {
+      "url": "DATABASE_URL",
+      "poolSize": 10,
+      "timeout": 30000
+    },
+    "migrations": {
+      "directory": "packages/server/prisma/migrations",
+      "backfillDirectory": "migrations/backfills",
+      "rollbackDirectory": "migrations/rollback-plans"
+    },
+    "backup": {
+      "enabled": true,
+      "directory": "./backups",
+      "retention": 7
+    }
+  },
+  "deployment": {
+    "registry": "ghcr.io",
+    "imageName": "reaatech/prompt-version-control",
+    "defaultTarget": "kubernetes",
+    "environments": {
+      "dev": {
+        "namespace": "prompt-version-control-dev",
+        "values": "deployments/helm/pvc/values-dev.yaml"
+      },
+      "staging": {
+        "namespace": "prompt-version-control-staging",
+        "values": "deployments/helm/pvc/values-staging.yaml"
+      },
+      "production": {
+        "namespace": "prompt-version-control",
+        "values": "deployments/helm/pvc/values-production.yaml"
+      }
+    }
+  },
+  "operations": {
+    "logFormat": "pino",
+    "defaultLookback": "1h",
+    "services": ["server", "cli", "mcp"]
+  }
+}
