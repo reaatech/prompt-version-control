@@ -38,7 +38,7 @@
     "@pvc/sdk": "workspace:*",
     "clipanion": "^4.0.0-rc.4",
     "typanion": "^3.14.0",
-    "zod": "^3.22.0"
+    "zod": "^4.3.6"
   },
   "devDependencies": {
     "@types/node": "^22.0.0",
