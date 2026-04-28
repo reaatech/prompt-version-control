@@ -39,7 +39,7 @@
     "db:studio": "prisma studio"
   },
   "dependencies": {
-    "@hono/node-server": "^1.11.0",
+    "@hono/node-server": "^2.0.0",
     "@hono/zod-validator": "^0.7.6",
     "@prisma/client": "^5.15.0",
     "@pvc/shared": "workspace:*",

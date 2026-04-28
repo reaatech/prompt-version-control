@@ -123,8 +123,8 @@ importers:
   packages/server:
     dependencies:
       '@hono/node-server':
-        specifier: ^1.11.0
-        version: 1.19.14(hono@4.12.15)
+        specifier: ^2.0.0
+        version: 2.0.0(hono@4.12.15)
       '@hono/zod-validator':
         specifier: ^0.7.6
         version: 0.7.6(hono@4.12.15)(zod@3.25.76)
@@ -546,6 +546,12 @@ packages:
   '@hono/node-server@1.19.14':
     resolution: {integrity: sha512-GwtvgtXxnWsucXvbQXkRgqksiH2Qed37H9xHZocE5sA3N8O8O8/8FA3uclQXxXVzc9XBZuEOMK7+r02FmSpHtw==}
     engines: {node: '>=18.14.1'}
+    peerDependencies:
+      hono: ^4
+
+  '@hono/node-server@2.0.0':
+    resolution: {integrity: sha512-n3GfHwwCvHCkGmOwKfxUPOlbfzuO64Sbc5XC4NGPIXxkuOnJrdgExdRKmHfF924r914WRJPT397GdqLvdYTeyQ==}
+    engines: {node: '>=20'}
     peerDependencies:
       hono: ^4
 
@@ -2436,7 +2442,7 @@ snapshots:
     dependencies:
       hono: 4.12.14
 
-  '@hono/node-server@1.19.14(hono@4.12.15)':
+  '@hono/node-server@2.0.0(hono@4.12.15)':
     dependencies:
       hono: 4.12.15
 
