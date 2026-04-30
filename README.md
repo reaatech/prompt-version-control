@@ -1,34 +1,49 @@
-# Prompt Version Control
+# prompt-version-control
 
-> Git-like versioning for AI prompts with eval-gated promotion
+[![CI](https://github.com/reaatech/prompt-version-control/actions/workflows/ci.yml/badge.svg)](https://github.com/reaatech/prompt-version-control/actions/workflows/ci.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.4-blue)](https://www.typescriptlang.org/)
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![TypeScript](https://img.shields.io/badge/TypeScript-5.3-blue)](https://www.typescriptlang.org/)
-[![pnpm](https://img.shields.io/badge/pnpm-9.x-orange)](https://pnpm.io/)
+> Git-like versioning for AI prompts with eval-gated promotion.
 
-## Overview
+This monorepo provides an API server, TypeScript SDK, CLI tool, and MCP server for version-controlling AI prompts — track changes, gate promotions on evaluation results, serve A/B deployments, and let agents pull managed prompts at runtime.
 
-Every team stores prompts as strings in code or config, edits them ad-hoc, and has no idea which version performed better. **Prompt Version Control** solves this by providing Git-like versioning for AI prompts with eval-gated promotion workflows.
+## Features
 
-### Key Features
+- **Version management** — store and track prompt versions with SHA-256 checksums and automatic numbering
+- **Tag-based lifecycle** — resolve prompts by `draft`, `staging`, and `production` tags
+- **Evaluation gates** — block staging→production promotion on eval harness results
+- **A/B deployments** — serve multiple versions with weighted traffic splitting and sticky sessions
+- **Semantic diffing** — compare versions with line-level diffs and semantic impact scoring
+- **Metrics tracking** — monitor per-version cost, latency, and quality metrics
+- **MCP integration** — AI agents pull managed prompts at runtime via the Model Context Protocol
+- **Structured logging** — Pino-based JSON logging with pretty-printing in development
+- **Prometheus metrics** — built-in `/metrics` endpoint for monitoring
 
-- **Version management** — store and track prompt versions with full metadata
-- **Lifecycle control** — tag prompts as draft/staging/production
-- **Quality gates** — gate staging→production promotion on eval results
-- **A/B testing** — serve multiple versions with configurable traffic splitting
-- **Metrics tracking** — monitor per-version cost, latency, and quality
-- **MCP integration** — agents pull managed prompts at runtime
+## Installation
 
-## Quick Start
+### Using the packages
 
-### Prerequisites
+Packages are published under the `@reaatech` scope and can be installed individually:
 
-- Node.js 22+
-- PostgreSQL 16+
-- Redis 7+
-- pnpm 9+
+```bash
+# API server (Hono + Prisma)
+pnpm add @reaatech/prompt-version-control-server
 
-### Installation
+# TypeScript SDK
+pnpm add @reaatech/prompt-version-control
+
+# CLI tool
+pnpm add -g @reaatech/prompt-version-control-cli
+
+# MCP server for AI agents
+pnpm add -g @reaatech/prompt-version-control-mcp
+
+# Shared types and utilities
+pnpm add @reaatech/prompt-version-control-shared
+```
+
+### Contributing
 
 ```bash
 # Clone the repository
@@ -41,49 +56,57 @@ pnpm install
 # Set up environment variables
 cp .env.example .env
 
-# Start development environment
+# Generate Prisma client and run migrations
+pnpm --filter @reaatech/prompt-version-control-server db:generate
+pnpm --filter @reaatech/prompt-version-control-server db:migrate
+
+# Start development server with hot reload
 pnpm dev
+
+# Run the test suite
+pnpm test
+
+# Run linting
+pnpm lint
 ```
+
+## Quick Start
 
 ### Using the CLI
 
 ```bash
 # Configure the CLI (writes ~/.pvcrc with mode 0600)
-pvc init --api-url http://localhost:3000 --api-key "$PVC_API_KEY"
+pvc init --api-url http://localhost:3000 --api-key "pvc_your-api-key"
 
 # Create a new prompt
 pvc prompt create -n customer-support -t "You are a helpful support agent. Help with: {{issue}}"
 
-# Create a new version (uses --content as template if --template is omitted)
+# Create a new version
 pvc version create -p customer-support -c "You are a senior support agent. Help with: {{issue}}"
 
-# Tag version 2 as production (accepts a version number or a version id)
+# Tag version 2 as production
 pvc tag set -p customer-support -v 2 -t production
 
-# Get the prompt (id or name)
+# Get the prompt
 pvc prompt get customer-support
 ```
 
-### Using the API
+### Using the SDK
 
-```bash
-# Create a prompt
-curl -X POST http://localhost:3000/api/v1/prompts \
-  -H "Authorization: Bearer your-api-key" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "name": "customer-support",
-    "template": "You are a helpful support agent. Help with: {{issue}}"
-  }'
+```typescript
+import { PromptVersionControlClient } from "@reaatech/prompt-version-control";
 
-# Get production version
-curl http://localhost:3000/api/v1/prompts/<promptId>/production \
-  -H "Authorization: Bearer your-api-key"
+const client = new PromptVersionControlClient({
+  baseUrl: "http://localhost:3000",
+  apiKey: "pvc_your-api-key",
+  cache: true,
+});
+
+const prod = await client.getProduction("customer-support");
+console.log(prod.content);
 ```
 
-### Using with MCP
-
-The MCP server ships as a separate binary `pvc-mcp` from `@pvc/mcp`. Add to your Claude Desktop configuration:
+### Using with MCP (Claude Desktop)
 
 ```json
 {
@@ -92,16 +115,22 @@ The MCP server ships as a separate binary `pvc-mcp` from `@pvc/mcp`. Add to your
       "command": "pvc-mcp",
       "env": {
         "PVC_API_URL": "http://localhost:3000",
-        "PVC_API_KEY": "your-api-key"
+        "PVC_API_KEY": "pvc_your-api-key"
       }
     }
   }
 }
 ```
 
-The server currently exposes:
+## Packages
 
-- `prompt.get` — retrieve the production version of a prompt with optional variable substitution
+| Package | Description |
+| ------- | ----------- |
+| [`@reaatech/prompt-version-control-server`](./packages/server) | API server with prompt CRUD, versioning, eval-gated promotion, A/B deployments |
+| [`@reaatech/prompt-version-control`](./packages/sdk) | TypeScript SDK with retry logic and caching |
+| [`@reaatech/prompt-version-control-cli`](./packages/cli) | `pvc` CLI tool for managing prompts from the terminal |
+| [`@reaatech/prompt-version-control-mcp`](./packages/mcp) | MCP server exposing prompt retrieval to AI agents |
+| [`@reaatech/prompt-version-control-shared`](./packages/shared) | Canonical types, Zod schemas, and utilities |
 
 ## Architecture
 
@@ -133,10 +162,27 @@ The server currently exposes:
 
 ## Documentation
 
-- [Development Plan](./DEV_PLAN.md) — phased development roadmap
 - [Architecture](./ARCHITECTURE.md) — detailed system design and technical specs
+- [Development Plan](./DEV_PLAN.md) — phased development roadmap
 - [Security policy](./SECURITY.md) — how to report vulnerabilities
+- [Contributing](./CONTRIBUTING.md) — contribution workflow
 - [API reference](./docs/api/openapi.yaml) — OpenAPI 3.0 spec (Swagger UI at `/api/v1/docs`)
+
+## Tech Stack
+
+- **Runtime**: Node.js 22+ (LTS)
+- **Language**: TypeScript 5.x (strict mode)
+- **Package manager**: pnpm 9.x
+- **Database**: PostgreSQL 16+ with Prisma ORM
+- **Cache**: Redis 7+
+- **API framework**: Hono 4.x
+- **CLI framework**: Clipanion 4.x
+- **MCP server**: @modelcontextprotocol/sdk
+- **Testing**: Vitest 2.x
+- **Validation**: Zod 3.x
+- **Logging**: Pino 9.x
+- **Metrics**: Prometheus client
+- **Templating**: Handlebars
 
 ## Project Structure
 
@@ -154,75 +200,8 @@ prompt-version-control/
 │   └── helm/             # Helm charts
 ├── docs/
 │   └── api/              # OpenAPI spec
+├── skills/               # AI agent skill definitions
 └── .github/              # CI/CD workflows
-```
-
-## Tech Stack
-
-- **Runtime**: Node.js 22+ (LTS)
-- **Language**: TypeScript 5.x (strict mode)
-- **Package manager**: pnpm 9.x
-- **Database**: PostgreSQL 16+ with Prisma ORM
-- **API framework**: Hono 4.x
-- **CLI framework**: Clipanion 4.x
-- **MCP server**: @modelcontextprotocol/sdk
-- **Testing**: Vitest 2.x
-- **Validation**: Zod 3.x
-- **Logging**: Pino 9.x
-- **Metrics**: Prometheus client
-
-## Development
-
-### Running Tests
-
-```bash
-# Run all tests
-pnpm test
-
-# Run with coverage
-pnpm test:coverage
-
-# Run a specific test file
-pnpm --filter @pvc/server test packages/server/src/services/__tests__/prompt.service.test.ts
-```
-
-### Code Quality
-
-```bash
-# Lint
-pnpm lint
-pnpm format
-
-# Type check
-pnpm typecheck
-```
-
-## Deployment
-
-### Docker
-
-```bash
-# Build the production image (run from repo root)
-docker build -f deployments/docker/Dockerfile -t prompt-version-control:latest .
-
-# Run the dev stack (postgres + redis + server with hot reload)
-docker compose -f deployments/docker/docker-compose.yml up -d
-```
-
-### Kubernetes
-
-```bash
-# Deploy with Helm (provide secrets at install time — never commit them)
-helm install pvc ./deployments/helm/pvc \
-  --namespace prompt-version-control \
-  --create-namespace \
-  --set postgresql.auth.password="$POSTGRES_PASSWORD" \
-  --set redis.auth.password="$REDIS_PASSWORD" \
-  --set secrets.JWT_SECRET="$JWT_SECRET" \
-  --set secrets.API_KEY_PEPPER="$API_KEY_PEPPER" \
-  --set secrets.EVAL_WEBHOOK_SECRET="$EVAL_WEBHOOK_SECRET" \
-  --set secrets.DATABASE_URL="$DATABASE_URL" \
-  --set secrets.REDIS_PASSWORD="$REDIS_PASSWORD"
 ```
 
 ## Contributing
@@ -237,13 +216,7 @@ See [CONTRIBUTING.md](./CONTRIBUTING.md) for details.
 
 ## License
 
-MIT License — see [LICENSE](./LICENSE) for details.
-
-## Support
-
-- **GitHub Issues**: [reaatech/prompt-version-control/issues](https://github.com/reaatech/prompt-version-control/issues)
-- **Security**: see [SECURITY.md](./SECURITY.md)
-- **Documentation**: [docs/](./docs/)
+[MIT](LICENSE)
 
 ---
 

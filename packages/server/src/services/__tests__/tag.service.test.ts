@@ -1,7 +1,7 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { TagService } from '../tag.service.js';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { prisma } from '../../db/client.js';
 import { NotFoundError } from '../../errors.js';
+import { TagService } from '../tag.service.js';
 
 vi.mock('../../db/client.js', () => ({
   prisma: {

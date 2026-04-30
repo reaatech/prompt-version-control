@@ -1,5 +1,5 @@
+import { randomUUID } from 'node:crypto';
 import type { MiddlewareHandler } from 'hono';
-import { randomUUID } from 'crypto';
 
 const REQUEST_ID_RE = /^[\w-]{1,128}$/;
 

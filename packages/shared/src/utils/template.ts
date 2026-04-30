@@ -18,10 +18,13 @@ export function renderTemplate(
   // Simple regex-based variable extraction
   const regex = /\{\{\{?\s*([a-zA-Z_][a-zA-Z0-9_]*)\s*\}?\}\}/g;
   const variablesUsed = new Set<string>();
-  let match;
-  while ((match = regex.exec(template)) !== null) {
-    variablesUsed.add(match[1]!);
-  }
+  let match: RegExpExecArray | null;
+  do {
+    match = regex.exec(template);
+    if (match) {
+      variablesUsed.add(match[1]);
+    }
+  } while (match !== null);
 
   const missingVariables: string[] = [];
   for (const v of variablesUsed) {

@@ -1,6 +1,6 @@
 import { Command, Option } from 'clipanion';
-import { loadConfig } from '../config.js';
 import { APIClient } from '../client.js';
+import { loadConfig } from '../config.js';
 
 export class PromptListCommand extends Command {
   static paths = [['prompt', 'list']];
@@ -66,7 +66,7 @@ export class PromptGetCommand extends Command {
     const client = new APIClient(config);
     const promptId = await client.resolvePromptId(this.promptRef);
     const prompt = await client.getPrompt(promptId);
-    this.context.stdout.write(JSON.stringify(prompt, null, 2) + '\n');
+    this.context.stdout.write(`${JSON.stringify(prompt, null, 2)}\n`);
     return 0;
   }
 }

@@ -1,6 +1,6 @@
-import { readFile, writeFile, chmod } from 'fs/promises';
-import { homedir } from 'os';
-import { join } from 'path';
+import { chmod, readFile, writeFile } from 'node:fs/promises';
+import { homedir } from 'node:os';
+import { join } from 'node:path';
 import { z } from 'zod';
 
 export interface PVCConfig {

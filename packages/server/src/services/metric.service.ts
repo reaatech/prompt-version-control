@@ -1,7 +1,7 @@
+import type { Prisma } from '@prisma/client';
+import type { IngestMetricInput, MetricType } from '@reaatech/prompt-version-control-shared';
 import { prisma } from '../db/client.js';
 import { NotFoundError } from '../errors.js';
-import type { IngestMetricInput, MetricType } from '@pvc/shared';
-import type { Prisma } from '@prisma/client';
 
 export class MetricService {
   async ingest(projectId: string, metrics: IngestMetricInput[]) {
@@ -17,6 +17,7 @@ export class MetricService {
 
     const invalid = versionIds.filter((id) => !validIds.has(id));
     if (invalid.length > 0) {
+      // biome-ignore lint/style/noNonNullAssertion: safe — guarded by length check
       throw new NotFoundError('Version', invalid[0]!);
     }
 

@@ -1,3 +1,5 @@
+import { PrismaClient } from '@prisma/client';
+import { calculateChecksum, generateApiKey } from '@reaatech/prompt-version-control-shared';
 /**
  * Cross-tenant isolation integration test. Skipped by default — opt in by
  * exporting PVC_INTEGRATION_DB=1 (and DATABASE_URL pointing at a disposable
@@ -5,17 +7,15 @@
  * scoped to project A can never read or modify resources owned by project B.
  *
  * Run locally: PVC_INTEGRATION_DB=1 DATABASE_URL=postgres://... pnpm --filter
- * @pvc/server test tenant-isolation
+ * @reaatech/prompt-version-control-server test tenant-isolation
  */
-import { describe, it, expect, beforeAll, afterAll } from 'vitest';
-import { PrismaClient } from '@prisma/client';
-import { calculateChecksum, generateApiKey } from '@pvc/shared';
+import { afterAll, beforeAll, describe, expect, it } from 'vitest';
+import { NotFoundError } from '../../errors.js';
+import { DeploymentService } from '../deployment.service.js';
+import { DiffEngine } from '../diff.engine.js';
+import { MetricService } from '../metric.service.js';
 import { PromptService } from '../prompt.service.js';
 import { TagService } from '../tag.service.js';
-import { DeploymentService } from '../deployment.service.js';
-import { MetricService } from '../metric.service.js';
-import { DiffEngine } from '../diff.engine.js';
-import { NotFoundError } from '../../errors.js';
 
 const enabled = process.env.PVC_INTEGRATION_DB === '1';
 

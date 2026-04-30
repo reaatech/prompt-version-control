@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { loadConfig, saveConfig } from '../config.js';
 
 vi.mock('fs/promises', () => ({
@@ -15,7 +15,7 @@ vi.mock('os', async (importOriginal) => {
   };
 });
 
-import { readFile, writeFile } from 'fs/promises';
+import { readFile, writeFile } from 'node:fs/promises';
 
 describe('loadConfig', () => {
   beforeEach(() => {

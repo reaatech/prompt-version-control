@@ -21,18 +21,18 @@ RUN pnpm install --frozen-lockfile
 # -----------------------------------------------------------------------------
 FROM base AS dev
 COPY . .
-RUN pnpm --filter @pvc/server exec prisma generate
+RUN pnpm --filter @reaatech/prompt-version-control-server exec prisma generate
 EXPOSE 3000
-CMD ["pnpm", "--filter", "@pvc/server", "dev"]
+CMD ["pnpm", "--filter", "@reaatech/prompt-version-control-server", "dev"]
 
 # -----------------------------------------------------------------------------
 # Builder: compile TS for the production runtime stage.
 # -----------------------------------------------------------------------------
 FROM base AS builder
 COPY . .
-RUN pnpm --filter @pvc/server exec prisma generate
+RUN pnpm --filter @reaatech/prompt-version-control-server exec prisma generate
 RUN pnpm build
-RUN pnpm --filter=@pvc/server deploy --prod /app/prod/server
+RUN pnpm --filter=@reaatech/prompt-version-control-server deploy --prod --legacy /app/prod/server
 
 # -----------------------------------------------------------------------------
 # Runtime: minimal image with just the compiled server.

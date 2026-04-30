@@ -1,10 +1,10 @@
-import { Hono } from 'hono';
 import { zValidator } from '@hono/zod-validator';
+import { renderTemplate } from '@reaatech/prompt-version-control-shared';
+import { Hono } from 'hono';
 import { z } from 'zod';
-import { renderTemplate } from '@pvc/shared';
-import { tagService } from '../../services/tag.service.js';
-import { promptService } from '../../services/prompt.service.js';
 import { authMiddleware } from '../../middleware/auth.js';
+import { promptService } from '../../services/prompt.service.js';
+import { tagService } from '../../services/tag.service.js';
 import { getProjectId } from '../../utils/context.js';
 
 const router = new Hono();
@@ -17,8 +17,8 @@ const RenderSchema = z.object({
 
 router.post('/prompts/:id/versions/:number/render', zValidator('json', RenderSchema), async (c) => {
   const projectId = getProjectId(c);
-  const promptId = c.req.param('id')!;
-  const number = Number(c.req.param('number')!);
+  const promptId = c.req.param('id') as string;
+  const number = Number(c.req.param('number') as string);
   const body = c.req.valid('json');
 
   const version = await promptService.getVersionByNumber(projectId, promptId, number);
@@ -36,7 +36,7 @@ router.post('/prompts/:id/versions/:number/render', zValidator('json', RenderSch
 
 router.post('/prompts/:id/render', zValidator('json', RenderSchema), async (c) => {
   const projectId = getProjectId(c);
-  const promptId = c.req.param('id')!;
+  const promptId = c.req.param('id') as string;
   const body = c.req.valid('json');
 
   const version = await tagService.getProductionVersion(projectId, promptId);

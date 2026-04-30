@@ -1,7 +1,7 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { Hono } from 'hono';
-import { metricsMiddleware } from '../metrics.js';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { httpRequestDuration } from '../../services/prometheus.service.js';
+import { metricsMiddleware } from '../metrics.js';
 
 describe('metricsMiddleware', () => {
   beforeEach(() => {

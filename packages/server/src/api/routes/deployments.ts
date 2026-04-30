@@ -1,8 +1,8 @@
-import { Hono } from 'hono';
 import { zValidator } from '@hono/zod-validator';
+import { Hono } from 'hono';
 import { z } from 'zod';
-import { deploymentService } from '../../services/deployment.service.js';
 import { authMiddleware } from '../../middleware/auth.js';
+import { deploymentService } from '../../services/deployment.service.js';
 import { getProjectId } from '../../utils/context.js';
 
 const router = new Hono();
@@ -42,7 +42,7 @@ router.get('/', async (c) => {
 
 router.get('/:id/resolve', async (c) => {
   const projectId = getProjectId(c);
-  const id = c.req.param('id')!;
+  const id = c.req.param('id') as string;
   const sessionId = c.req.query('sessionId');
   const versionId = await deploymentService.resolveVersion(projectId, id, sessionId ?? undefined);
   return c.json({ versionId, sessionId });
@@ -54,7 +54,7 @@ const UpdateDeploymentSchema = z.object({
 
 router.put('/:id', zValidator('json', UpdateDeploymentSchema), async (c) => {
   const projectId = getProjectId(c);
-  const id = c.req.param('id')!;
+  const id = c.req.param('id') as string;
   const body = c.req.valid('json');
   const deployment = await deploymentService.updateStatus(projectId, id, body.status);
   return c.json(deployment);

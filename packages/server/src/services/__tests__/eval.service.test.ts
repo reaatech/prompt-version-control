@@ -1,8 +1,8 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { createHmac } from 'crypto';
-import { EvalService } from '../eval.service.js';
+import { createHmac } from 'node:crypto';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { prisma } from '../../db/client.js';
 import { NotFoundError, UnauthorizedError } from '../../errors.js';
+import { EvalService } from '../eval.service.js';
 
 vi.mock('../../db/client.js', () => ({
   prisma: {
@@ -28,6 +28,7 @@ describe('EvalService', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
+    // biome-ignore lint/performance/noDelete: env var must be absent, not set to string 'undefined'
     delete process.env.EVAL_WEBHOOK_SECRET;
     service = new EvalService();
   });

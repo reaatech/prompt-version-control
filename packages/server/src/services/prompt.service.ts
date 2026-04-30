@@ -1,10 +1,14 @@
+import type { Prisma, Prompt, Version } from '@prisma/client';
+import { calculateChecksum } from '@reaatech/prompt-version-control-shared';
+import type {
+  CreatePromptInput,
+  CreateVersionInput,
+  UpdatePromptInput,
+} from '@reaatech/prompt-version-control-shared';
 import { prisma } from '../db/client.js';
 import { ConflictError, NotFoundError } from '../errors.js';
-import { calculateChecksum } from '@pvc/shared';
-import { promptVersionsCreated } from './prometheus.service.js';
 import { paginateResult } from '../utils/pagination.js';
-import type { CreatePromptInput, CreateVersionInput, UpdatePromptInput } from '@pvc/shared';
-import type { Prompt, Version, Prisma } from '@prisma/client';
+import { promptVersionsCreated } from './prometheus.service.js';
 
 export class PromptService {
   async createPrompt(projectId: string, data: CreatePromptInput): Promise<Prompt> {

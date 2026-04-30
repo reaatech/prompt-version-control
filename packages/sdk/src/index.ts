@@ -1,4 +1,4 @@
-import { sleep } from '@pvc/shared';
+import { sleep } from '@reaatech/prompt-version-control-shared';
 
 export interface PVCClientOptions {
   apiKey: string;

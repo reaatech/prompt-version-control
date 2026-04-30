@@ -1,8 +1,8 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { Hono } from 'hono';
-import { metricRoutes } from '../metrics.js';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { prisma } from '../../../db/client.js';
 import { metricService } from '../../../services/metric.service.js';
+import { metricRoutes } from '../metrics.js';
 
 vi.mock('../../../services/metric.service.js', () => ({
   metricService: {
@@ -43,7 +43,7 @@ describe('metricRoutes', () => {
       }),
     });
     expect(res.status).toBe(201);
-    const body = await res.json();
+    const body = (await res.json()) as any;
     expect(body.ingested).toBe(2);
   });
 
@@ -52,7 +52,7 @@ describe('metricRoutes', () => {
 
     const res = await app.request('/metrics/versions/v1?hours=24', { headers: authHeader() });
     expect(res.status).toBe(200);
-    const body = await res.json();
+    const body = (await res.json()) as any;
     expect(body.data).toHaveLength(1);
   });
 
@@ -61,7 +61,7 @@ describe('metricRoutes', () => {
 
     const res = await app.request('/metrics/prompts/p1', { headers: authHeader() });
     expect(res.status).toBe(200);
-    const body = await res.json();
+    const body = (await res.json()) as any;
     expect(body.data).toHaveLength(1);
   });
 });

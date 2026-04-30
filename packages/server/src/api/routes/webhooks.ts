@@ -1,8 +1,8 @@
-import { Hono } from 'hono';
 import { zValidator } from '@hono/zod-validator';
+import { Hono } from 'hono';
 import { z } from 'zod';
-import { webhookService } from '../../services/webhook.service.js';
 import { authMiddleware } from '../../middleware/auth.js';
+import { webhookService } from '../../services/webhook.service.js';
 import { getProjectId } from '../../utils/context.js';
 
 const router = new Hono();
@@ -42,7 +42,7 @@ router.get('/', async (c) => {
 // Delete subscription
 router.delete('/:id', async (c) => {
   const projectId = getProjectId(c);
-  const id = c.req.param('id')!;
+  const id = c.req.param('id') as string;
   await webhookService.deleteSubscription(projectId, id);
   return c.body(null, 204);
 });
@@ -50,7 +50,7 @@ router.delete('/:id', async (c) => {
 // Test delivery
 router.post('/:id/test', async (c) => {
   const projectId = getProjectId(c);
-  const id = c.req.param('id')!;
+  const id = c.req.param('id') as string;
   const result = await webhookService.testDelivery(projectId, id);
   return c.json(result);
 });

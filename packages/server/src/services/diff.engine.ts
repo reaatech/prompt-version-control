@@ -1,6 +1,6 @@
+import type { DiffResult, DiffSection } from '@reaatech/prompt-version-control-shared';
 import { prisma } from '../db/client.js';
 import { NotFoundError } from '../errors.js';
-import type { DiffResult, DiffSection } from '@pvc/shared';
 
 export class DiffEngine {
   async diff(
@@ -51,29 +51,36 @@ export class DiffEngine {
 
     while (i < fromLines.length || j < toLines.length) {
       if (i >= fromLines.length) {
+        // biome-ignore lint/style/noNonNullAssertion: safe — guarded by length check
         sections.push({ type: 'added', value: toLines[j]! });
         j++;
       } else if (j >= toLines.length) {
+        // biome-ignore lint/style/noNonNullAssertion: safe — guarded by length check
         sections.push({ type: 'removed', value: fromLines[i]! });
         i++;
       } else if (fromLines[i] === toLines[j]) {
         i++;
         j++;
       } else {
+        // biome-ignore lint/style/noNonNullAssertion: safe — valid array indices
         const nextMatchFrom = toLines.indexOf(fromLines[i]!, j);
+        // biome-ignore lint/style/noNonNullAssertion: safe — valid array indices
         const nextMatchTo = fromLines.indexOf(toLines[j]!, i);
 
         if (nextMatchFrom === -1 && nextMatchTo === -1) {
+          // biome-ignore lint/style/noNonNullAssertion: safe — valid array indices
           sections.push({ type: 'modified', value: toLines[j]!, lineStart: i + 1 });
           i++;
           j++;
         } else if (nextMatchTo !== -1 && (nextMatchFrom === -1 || nextMatchTo < nextMatchFrom)) {
           for (let k = i; k < nextMatchTo; k++) {
+            // biome-ignore lint/style/noNonNullAssertion: safe — k < fromLines.length
             sections.push({ type: 'removed', value: fromLines[k]! });
           }
           i = nextMatchTo;
         } else {
           for (let k = j; k < nextMatchFrom; k++) {
+            // biome-ignore lint/style/noNonNullAssertion: safe — k < toLines.length
             sections.push({ type: 'added', value: toLines[k]! });
           }
           j = nextMatchFrom;

@@ -1,6 +1,6 @@
 import { Command, Option } from 'clipanion';
-import { loadConfig } from '../config.js';
 import { APIClient } from '../client.js';
+import { loadConfig } from '../config.js';
 
 export class TagSetCommand extends Command {
   static paths = [['tag', 'set']];

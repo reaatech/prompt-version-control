@@ -2,8 +2,8 @@
 import { Server } from '@modelcontextprotocol/sdk/server/index.js';
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
 import { CallToolRequestSchema, ListToolsRequestSchema } from '@modelcontextprotocol/sdk/types.js';
-import { PVCClient } from '@pvc/sdk';
-import { renderTemplate } from '@pvc/shared';
+import { PVCClient } from '@reaatech/prompt-version-control';
+import { renderTemplate } from '@reaatech/prompt-version-control-shared';
 import { z } from 'zod';
 
 const PromptGetArgsSchema = z.object({

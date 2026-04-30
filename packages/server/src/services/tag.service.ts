@@ -1,7 +1,7 @@
+import type { Tag } from '@prisma/client';
+import type { TagName } from '@reaatech/prompt-version-control-shared';
 import { prisma } from '../db/client.js';
 import { NotFoundError } from '../errors.js';
-import type { TagName } from '@pvc/shared';
-import type { Tag } from '@prisma/client';
 
 async function assertPromptInProject(projectId: string, promptId: string): Promise<void> {
   const prompt = await prisma.prompt.findFirst({

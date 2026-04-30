@@ -20,7 +20,7 @@ services:
       - ../../packages/server/src:/app/packages/server/src
       - ../../packages/shared/src:/app/packages/shared/src
       - ../../docs:/app/docs
-    command: ['pnpm', '--filter', '@pvc/server', 'dev']
+    command: ['pnpm', '--filter', '@reaatech/prompt-version-control-server', 'dev']
 
   db:
     image: postgres:16-alpine

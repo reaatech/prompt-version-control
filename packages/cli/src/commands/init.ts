@@ -15,7 +15,7 @@ export class InitCommand extends Command {
     }
 
     await saveConfig({ apiUrl: url, apiKey: this.apiKey });
-    this.context.stdout.write(`Initialized PVC CLI\n`);
+    this.context.stdout.write('Initialized PVC CLI\n');
     this.context.stdout.write(`API URL: ${url}\n`);
     return 0;
   }
