@@ -56,5 +56,11 @@ jest-results/
 *.tmp
 *.md.backup
 
+# Stray build output in src/ (from misconfigured builds)
+packages/*/src/**/*.js
+packages/*/src/**/*.js.map
+packages/*/src/**/*.d.ts
+packages/*/src/**/*.d.ts.map
+
 # Development
 DEV_PLAN.md

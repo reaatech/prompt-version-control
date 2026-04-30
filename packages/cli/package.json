@@ -1,5 +1,5 @@
 {
-  "name": "@pvc/cli",
+  "name": "@reaatech/prompt-version-control-cli",
   "version": "0.1.0",
   "description": "Prompt Version Control CLI",
   "license": "MIT",
@@ -13,29 +13,33 @@
     "url": "https://github.com/reaatech/prompt-version-control/issues"
   },
   "homepage": "https://github.com/reaatech/prompt-version-control/tree/main/packages/cli#readme",
-  "keywords": [
-    "prompt",
-    "version-control",
-    "cli"
-  ],
+  "keywords": ["prompt", "version-control", "cli"],
   "type": "module",
   "bin": {
     "pvc": "./dist/index.js"
   },
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": ["dist"],
+  "publishConfig": {
+    "access": "public"
+  },
   "scripts": {
     "build": "tsc",
     "dev": "tsx watch src/index.ts",
-    "typecheck": "tsc --noEmit",
-    "lint": "eslint src/",
-    "lint:fix": "eslint src/ --fix",
     "test": "vitest run",
-    "test:coverage": "vitest run --coverage"
+    "test:coverage": "vitest run --coverage",
+    "clean": "rm -rf dist"
   },
   "dependencies": {
-    "@pvc/shared": "workspace:*",
-    "@pvc/sdk": "workspace:*",
+    "@reaatech/prompt-version-control-shared": "workspace:*",
+    "@reaatech/prompt-version-control": "workspace:*",
     "clipanion": "^4.0.0-rc.4",
     "typanion": "^3.14.0",
     "zod": "^3.22.0"
@@ -43,7 +47,7 @@
   "devDependencies": {
     "@types/node": "^22.0.0",
     "tsx": "^4.0.0",
-    "typescript": "^5.4.0",
-    "vitest": "^2.0.0"
+    "typescript": "^5.8.3",
+    "vitest": "^3.1.1"
   }
 }

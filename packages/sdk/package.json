@@ -1,5 +1,5 @@
 {
-  "name": "@pvc/sdk",
+  "name": "@reaatech/prompt-version-control",
   "version": "0.1.0",
   "description": "Prompt Version Control TypeScript SDK",
   "license": "MIT",
@@ -13,36 +13,33 @@
     "url": "https://github.com/reaatech/prompt-version-control/issues"
   },
   "homepage": "https://github.com/reaatech/prompt-version-control/tree/main/packages/sdk#readme",
-  "keywords": [
-    "prompt",
-    "version-control",
-    "sdk",
-    "typescript"
-  ],
+  "keywords": ["prompt", "version-control", "sdk", "typescript"],
   "type": "module",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "exports": {
     ".": {
-      "import": "./dist/index.js",
-      "types": "./dist/index.d.ts"
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
     }
+  },
+  "files": ["dist"],
+  "publishConfig": {
+    "access": "public"
   },
   "scripts": {
     "build": "tsc",
     "dev": "tsc --watch",
-    "typecheck": "tsc --noEmit",
-    "lint": "eslint src/",
-    "lint:fix": "eslint src/ --fix",
     "test": "vitest run",
-    "test:coverage": "vitest run --coverage"
+    "test:coverage": "vitest run --coverage",
+    "clean": "rm -rf dist"
   },
   "dependencies": {
-    "@pvc/shared": "workspace:*"
+    "@reaatech/prompt-version-control-shared": "workspace:*"
   },
   "devDependencies": {
     "@types/node": "^22.0.0",
-    "typescript": "^5.4.0",
-    "vitest": "^2.0.0"
+    "typescript": "^5.8.3",
+    "vitest": "^3.1.1"
   }
 }
