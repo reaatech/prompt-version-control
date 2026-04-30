@@ -1,8 +1,8 @@
+import { createHash } from 'node:crypto';
+import type { DeploymentStatus } from '@prisma/client';
 import { prisma } from '../db/client.js';
 import { redis } from '../db/redis.js';
 import { AppError, NotFoundError } from '../errors.js';
-import type { DeploymentStatus } from '@prisma/client';
-import { createHash } from 'crypto';
 
 export interface DeploymentVariant {
   versionId: string;
@@ -133,7 +133,7 @@ export class DeploymentService {
         return variant.versionId;
       }
     }
-    return variants[variants.length - 1]!.versionId;
+    return variants[variants.length - 1]?.versionId;
   }
 
   private selectByHash(sessionId: string, variants: Array<{ versionId: string; weight: number }>) {
@@ -141,7 +141,7 @@ export class DeploymentService {
       throw new AppError('DEPLOYMENT_EMPTY', 500, 'No variants configured');
     }
     const hash = createHash('sha256').update(sessionId).digest('hex');
-    const intValue = parseInt(hash.slice(0, 8), 16);
+    const intValue = Number.parseInt(hash.slice(0, 8), 16);
     const bucket = intValue % 100;
     let cumulative = 0;
     for (const variant of variants) {
@@ -150,7 +150,7 @@ export class DeploymentService {
         return variant.versionId;
       }
     }
-    return variants[variants.length - 1]!.versionId;
+    return variants[variants.length - 1]?.versionId;
   }
 }
 

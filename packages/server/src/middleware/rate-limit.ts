@@ -1,7 +1,7 @@
+import { createHash, randomBytes } from 'node:crypto';
 import type { MiddlewareHandler } from 'hono';
-import { createHash, randomBytes } from 'crypto';
-import { RateLimitError } from '../errors.js';
 import { redis } from '../db/redis.js';
+import { RateLimitError } from '../errors.js';
 import { logger } from '../utils/logger.js';
 
 interface RateLimitOpts {
@@ -24,7 +24,7 @@ function rateLimitId(c: { req: { header(name: string): string | undefined } }): 
   const xff = c.req.header('x-forwarded-for');
   if (xff) {
     // Take only the first IP (the client) and hash it for symmetry with key path.
-    const client = xff.split(',')[0]!.trim();
+    const client = xff.split(',')[0]?.trim();
     return `ip:${createHash('sha256').update(client).digest('hex').slice(0, 32)}`;
   }
   return 'anonymous';

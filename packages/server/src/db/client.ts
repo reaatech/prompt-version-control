@@ -19,7 +19,7 @@ export const prisma =
   });
 
 if (process.env.NODE_ENV === 'development') {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  // biome-ignore lint/suspicious/noExplicitAny: Prisma internal event type
   (prisma as any).$on('query', (e: { query: string; duration: number }) => {
     logger.debug({ query: e.query, duration: e.duration }, 'prisma query');
   });

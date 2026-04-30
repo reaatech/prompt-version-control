@@ -1,8 +1,8 @@
-import { describe, it, expect, vi, beforeAll, beforeEach } from 'vitest';
 import { Server } from '@modelcontextprotocol/sdk/server/index.js';
-import { ListToolsRequestSchema, CallToolRequestSchema } from '@modelcontextprotocol/sdk/types.js';
-import { PVCClient } from '@pvc/sdk';
-import { renderTemplate } from '@pvc/shared';
+import { CallToolRequestSchema, ListToolsRequestSchema } from '@modelcontextprotocol/sdk/types.js';
+import { PVCClient } from '@reaatech/prompt-version-control';
+import { renderTemplate } from '@reaatech/prompt-version-control-shared';
+import { beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 
 vi.mock('@modelcontextprotocol/sdk/server/index.js', () => ({
   Server: vi.fn().mockImplementation(() => ({
@@ -20,18 +20,18 @@ vi.mock('@modelcontextprotocol/sdk/types.js', () => ({
   CallToolRequestSchema: 'CallToolRequestSchema',
 }));
 
-vi.mock('@pvc/sdk', () => ({
+vi.mock('@reaatech/prompt-version-control', () => ({
   PVCClient: vi.fn().mockImplementation(() => ({
     getProduction: vi.fn(),
   })),
 }));
 
-vi.mock('@pvc/shared', () => ({
+vi.mock('@reaatech/prompt-version-control-shared', () => ({
   renderTemplate: vi.fn(),
 }));
 
 describe('MCP Server', () => {
-  let serverInstance: ReturnType<typeof vi.mocked<typeof Server>>;
+  let serverInstance: any;
   let clientInstance: { getProduction: ReturnType<typeof vi.fn> };
   let listToolsHandler: (...args: any[]) => Promise<any>;
   let callToolHandler: (...args: any[]) => Promise<any>;
@@ -43,10 +43,12 @@ describe('MCP Server', () => {
     const handlerCalls = vi.mocked(serverInstance.setRequestHandler).mock.calls;
 
     listToolsHandler = handlerCalls.find(
-      ([schema]) => schema === ListToolsRequestSchema,
+      ([schema]: any[]) => schema === ListToolsRequestSchema,
     )?.[1] as any;
 
-    callToolHandler = handlerCalls.find(([schema]) => schema === CallToolRequestSchema)?.[1] as any;
+    callToolHandler = handlerCalls.find(
+      ([schema]: any[]) => schema === CallToolRequestSchema,
+    )?.[1] as any;
 
     clientInstance = vi.mocked(PVCClient).mock.results[0].value;
   });

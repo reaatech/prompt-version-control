@@ -1,19 +1,19 @@
-import { Hono } from 'hono';
 import { zValidator } from '@hono/zod-validator';
 import {
   CreatePromptSchema,
-  UpdatePromptSchema,
   CreateVersionSchema,
-  PaginationSchema,
   DiffRequestSchema,
-} from '@pvc/shared';
+  PaginationSchema,
+  UpdatePromptSchema,
+} from '@reaatech/prompt-version-control-shared';
+import { Hono } from 'hono';
+import { auditMiddleware } from '../../middleware/audit.js';
+import { authMiddleware } from '../../middleware/auth.js';
+import { diffEngine } from '../../services/diff.engine.js';
 import { promptService } from '../../services/prompt.service.js';
 import { tagService } from '../../services/tag.service.js';
-import { diffEngine } from '../../services/diff.engine.js';
-import { tagRoutes } from './tags.js';
-import { authMiddleware } from '../../middleware/auth.js';
-import { auditMiddleware } from '../../middleware/audit.js';
 import { getProjectId } from '../../utils/context.js';
+import { tagRoutes } from './tags.js';
 
 const router = new Hono();
 

@@ -1,13 +1,13 @@
-import { Hono } from 'hono';
 import { zValidator } from '@hono/zod-validator';
+import { Hono } from 'hono';
 import { z } from 'zod';
-import { tagService } from '../../services/tag.service.js';
-import { evalService } from '../../services/eval.service.js';
 import { prisma } from '../../db/client.js';
-import { authMiddleware } from '../../middleware/auth.js';
-import { auditMiddleware } from '../../middleware/audit.js';
-import { getProjectId } from '../../utils/context.js';
 import { AppError, NotFoundError } from '../../errors.js';
+import { auditMiddleware } from '../../middleware/audit.js';
+import { authMiddleware } from '../../middleware/auth.js';
+import { evalService } from '../../services/eval.service.js';
+import { tagService } from '../../services/tag.service.js';
+import { getProjectId } from '../../utils/context.js';
 
 const router = new Hono();
 
@@ -15,9 +15,9 @@ router.use('*', authMiddleware);
 
 router.post('/prompts/:id/promote', auditMiddleware('prompt', 'promote'), async (c) => {
   const projectId = getProjectId(c);
-  const promptId = c.req.param('id')!;
+  const promptId = c.req.param('id') as string;
 
-  let stagingTag;
+  let stagingTag: Awaited<ReturnType<typeof tagService.getTag>> | null;
   try {
     stagingTag = await tagService.getTag(projectId, promptId, 'staging');
   } catch (err) {
@@ -56,7 +56,7 @@ router.post(
   zValidator('json', OverrideSchema),
   async (c) => {
     const projectId = getProjectId(c);
-    const promptId = c.req.param('id')!;
+    const promptId = c.req.param('id') as string;
     const body = c.req.valid('json');
 
     await tagService.moveTag(projectId, promptId, 'production', body.versionId);
@@ -72,9 +72,9 @@ router.post(
 
 router.post('/prompts/:id/rollback', auditMiddleware('prompt', 'rollback'), async (c) => {
   const projectId = getProjectId(c);
-  const promptId = c.req.param('id')!;
+  const promptId = c.req.param('id') as string;
 
-  let prodTag;
+  let prodTag: Awaited<ReturnType<typeof tagService.getTag>> | null;
   try {
     prodTag = await tagService.getTag(projectId, promptId, 'production');
   } catch (err) {

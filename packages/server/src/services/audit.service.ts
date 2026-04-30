@@ -1,6 +1,6 @@
+import type { AuditLog, Prisma } from '@prisma/client';
 import { prisma } from '../db/client.js';
 import { logger } from '../utils/logger.js';
-import type { AuditLog, Prisma } from '@prisma/client';
 
 export class AuditService {
   async log(entry: Omit<AuditLog, 'id' | 'createdAt'>): Promise<void> {

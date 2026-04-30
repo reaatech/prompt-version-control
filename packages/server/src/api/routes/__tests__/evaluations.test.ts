@@ -1,9 +1,9 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { hashApiKey } from '@reaatech/prompt-version-control-shared';
 import { Hono } from 'hono';
-import { hashApiKey } from '@pvc/shared';
-import { evaluationRoutes } from '../evaluations.js';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { prisma } from '../../../db/client.js';
 import { evalService } from '../../../services/eval.service.js';
+import { evaluationRoutes } from '../evaluations.js';
 
 vi.mock('../../../services/eval.service.js', () => ({
   evalService: {
@@ -84,7 +84,7 @@ describe('evaluationRoutes', () => {
 
     const res = await app.request('/evaluations/versions/v1', { headers: authHeader() });
     expect(res.status).toBe(200);
-    const body = await res.json();
+    const body = (await res.json()) as any;
     expect(body.data).toHaveLength(1);
     expect(evalService.listByVersion).toHaveBeenCalledWith('proj_1', 'v1');
   });
@@ -97,7 +97,7 @@ describe('evaluationRoutes', () => {
 
     const res = await app.request('/evaluations/versions/v1/gate', { headers: authHeader() });
     expect(res.status).toBe(200);
-    const body = await res.json();
+    const body = (await res.json()) as any;
     expect(body.canPromote).toBe(true);
   });
 });

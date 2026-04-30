@@ -1,5 +1,5 @@
 import { PrismaClient } from '@prisma/client';
-import { calculateChecksum, generateApiKey } from '@pvc/shared';
+import { calculateChecksum, generateApiKey } from '@reaatech/prompt-version-control-shared';
 
 const prisma = new PrismaClient();
 
@@ -13,7 +13,7 @@ async function main() {
   });
 
   // Create an API key
-  const { key, prefix, hash } = generateApiKey();
+  const { key: _key, prefix, hash } = generateApiKey();
   await prisma.apiKey.create({
     data: {
       projectId: project.id,
@@ -88,8 +88,8 @@ async function main() {
   });
 
   console.log(`Created prompt: ${prompt.name} (${prompt.id})`);
-  console.log(`  v1 -> staging`);
-  console.log(`  v2 -> production`);
+  console.log('  v1 -> staging');
+  console.log('  v2 -> production');
 }
 
 main()

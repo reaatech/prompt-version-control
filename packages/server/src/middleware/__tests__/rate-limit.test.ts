@@ -1,7 +1,7 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { Hono } from 'hono';
-import { rateLimit } from '../rate-limit.js';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { errorHandler } from '../error-handler.js';
+import { rateLimit } from '../rate-limit.js';
 
 describe('rateLimit', () => {
   beforeEach(() => {
@@ -51,7 +51,7 @@ describe('rateLimit', () => {
       headers: { authorization: 'Bearer key-3' },
     });
     expect(res.status).toBe(429);
-    const body = await res.json();
+    const body = (await res.json()) as any;
     expect(body.error.code).toBe('RATE_LIMIT_EXCEEDED');
   });
 

@@ -1,7 +1,7 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { PromptService } from '../prompt.service.js';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { prisma } from '../../db/client.js';
 import { ConflictError, NotFoundError } from '../../errors.js';
+import { PromptService } from '../prompt.service.js';
 
 vi.mock('../../db/client.js', () => ({
   prisma: {

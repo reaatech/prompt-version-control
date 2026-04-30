@@ -1,8 +1,8 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { Hono } from 'hono';
-import { deploymentRoutes } from '../deployments.js';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { prisma } from '../../../db/client.js';
 import { deploymentService } from '../../../services/deployment.service.js';
+import { deploymentRoutes } from '../deployments.js';
 
 vi.mock('../../../services/deployment.service.js', () => ({
   deploymentService: {
@@ -56,7 +56,7 @@ describe('deploymentRoutes', () => {
 
     const res = await app.request('/deployments', { headers: authHeader() });
     expect(res.status).toBe(200);
-    const body = await res.json();
+    const body = (await res.json()) as any;
     expect(body.data).toHaveLength(1);
   });
 
@@ -67,7 +67,7 @@ describe('deploymentRoutes', () => {
       headers: authHeader(),
     });
     expect(res.status).toBe(200);
-    const body = await res.json();
+    const body = (await res.json()) as any;
     expect(body.versionId).toBe('v1');
   });
 

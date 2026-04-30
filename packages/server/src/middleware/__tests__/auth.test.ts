@@ -1,8 +1,8 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { hashApiKey } from '@reaatech/prompt-version-control-shared';
 import { Hono } from 'hono';
-import { hashApiKey } from '@pvc/shared';
-import { authMiddleware } from '../auth.js';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { prisma } from '../../db/client.js';
+import { authMiddleware } from '../auth.js';
 import { errorHandler } from '../error-handler.js';
 
 vi.mock('../../db/client.js', () => ({
@@ -28,7 +28,7 @@ describe('authMiddleware', () => {
   it('should throw UnauthorizedError when authorization header is missing', async () => {
     const res = await app.request('/test');
     expect(res.status).toBe(401);
-    const body = await res.json();
+    const body = (await res.json()) as any;
     expect(body.error.code).toBe('UNAUTHORIZED');
   });
 
@@ -37,7 +37,7 @@ describe('authMiddleware', () => {
       headers: { authorization: 'Basic abc' },
     });
     expect(res.status).toBe(401);
-    const body = await res.json();
+    const body = (await res.json()) as any;
     expect(body.error.code).toBe('UNAUTHORIZED');
   });
 
@@ -48,7 +48,7 @@ describe('authMiddleware', () => {
       headers: { authorization: 'Bearer invalid-key' },
     });
     expect(res.status).toBe(401);
-    const body = await res.json();
+    const body = (await res.json()) as any;
     expect(body.error.code).toBe('UNAUTHORIZED');
   });
 
@@ -63,13 +63,13 @@ describe('authMiddleware', () => {
       expiresAt: past,
       lastUsedAt: null,
       createdAt: new Date(),
-    } as Awaited<ReturnType<typeof prisma.apiKey.findUnique>>);
+    } as unknown as Awaited<ReturnType<typeof prisma.apiKey.findUnique>>);
 
     const res = await app.request('/test', {
       headers: { authorization: 'Bearer expired-key' },
     });
     expect(res.status).toBe(401);
-    const body = await res.json();
+    const body = (await res.json()) as any;
     expect(body.error.message).toContain('expired');
   });
 
@@ -83,7 +83,7 @@ describe('authMiddleware', () => {
       expiresAt: null,
       lastUsedAt: null,
       createdAt: new Date(),
-    } as Awaited<ReturnType<typeof prisma.apiKey.findUnique>>);
+    } as unknown as Awaited<ReturnType<typeof prisma.apiKey.findUnique>>);
 
     let capturedProjectId: string | undefined;
     let capturedApiKey: unknown;

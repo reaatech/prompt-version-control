@@ -1,5 +1,5 @@
+import { hashApiKey } from '@reaatech/prompt-version-control-shared';
 import type { MiddlewareHandler } from 'hono';
-import { hashApiKey } from '@pvc/shared';
 import { prisma } from '../db/client.js';
 import { UnauthorizedError } from '../errors.js';
 

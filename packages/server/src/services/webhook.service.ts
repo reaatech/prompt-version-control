@@ -1,10 +1,10 @@
+import { createHmac } from 'node:crypto';
+import { lookup } from 'node:dns/promises';
+import { isIP } from 'node:net';
+import { sleep } from '@reaatech/prompt-version-control-shared';
 import { prisma } from '../db/client.js';
 import { logger } from '../utils/logger.js';
-import { eventBus, type AppEvent, type EventType } from './event.bus.js';
-import { createHmac } from 'crypto';
-import { isIP } from 'net';
-import { lookup } from 'dns/promises';
-import { sleep } from '@pvc/shared';
+import { type AppEvent, type EventType, eventBus } from './event.bus.js';
 
 const WEBHOOK_TIMEOUT_MS = 10_000;
 const ALLOW_PRIVATE = process.env.WEBHOOK_ALLOW_PRIVATE === '1';
@@ -160,6 +160,7 @@ export class WebhookService {
           const result = await this.send(sub.url, sub.secret, event);
           if (result.success) return;
           if (attempt < this.retryDelays.length) {
+            // biome-ignore lint/style/noNonNullAssertion: safe — guarded by length check
             await sleep(this.retryDelays[attempt]!);
           }
         }

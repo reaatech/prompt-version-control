@@ -1,8 +1,8 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { Hono } from 'hono';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { ZodError } from 'zod';
-import { errorHandler } from '../error-handler.js';
 import { NotFoundError } from '../../errors.js';
+import { errorHandler } from '../error-handler.js';
 
 vi.mock('../../utils/logger.js', () => ({
   logger: {
@@ -22,14 +22,25 @@ describe('errorHandler', () => {
   it('should return 400 with validation details for ZodError', async () => {
     app.get('/zod', () => {
       throw new ZodError([
-        { path: ['name'], message: 'Required', code: 'invalid_type' },
-        { path: ['email'], message: 'Invalid email', code: 'invalid_string' },
+        {
+          code: 'invalid_type' as const,
+          path: ['name'],
+          message: 'Required',
+          expected: 'string',
+          received: 'undefined',
+        },
+        {
+          code: 'invalid_string' as const,
+          path: ['email'],
+          message: 'Invalid email',
+          validation: 'email',
+        },
       ]);
     });
 
     const res = await app.request('/zod');
     expect(res.status).toBe(400);
-    const body = await res.json();
+    const body = (await res.json()) as any;
     expect(body.error.code).toBe('VALIDATION_ERROR');
     expect(body.error.details.fields).toEqual({
       name: ['Required'],
@@ -44,7 +55,7 @@ describe('errorHandler', () => {
 
     const res = await app.request('/notfound');
     expect(res.status).toBe(404);
-    const body = await res.json();
+    const body = (await res.json()) as any;
     expect(body.error.code).toBe('NOT_FOUND');
     expect(body.error.message).toContain('Prompt with id 123 not found');
   });
@@ -56,7 +67,7 @@ describe('errorHandler', () => {
 
     const res = await app.request('/unknown');
     expect(res.status).toBe(500);
-    const body = await res.json();
+    const body = (await res.json()) as any;
     expect(body.error.code).toBe('INTERNAL_ERROR');
     expect(body.error.message).toBe('Internal server error');
   });

@@ -1,10 +1,10 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { Hono } from 'hono';
-import { promptRoutes } from '../prompts.js';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { prisma } from '../../../db/client.js';
+import { diffEngine } from '../../../services/diff.engine.js';
 import { promptService } from '../../../services/prompt.service.js';
 import { tagService } from '../../../services/tag.service.js';
-import { diffEngine } from '../../../services/diff.engine.js';
+import { promptRoutes } from '../prompts.js';
 
 vi.mock('../../../services/prompt.service.js', () => ({
   promptService: {
@@ -61,11 +61,11 @@ describe('promptRoutes', () => {
     vi.mocked(promptService.listPrompts).mockResolvedValue({
       data: [{ id: 'p1', name: 'test' }],
       meta: { limit: 20 },
-    });
+    } as any);
 
     const res = await app.request('/prompts?limit=20', { headers: authHeader() });
     expect(res.status).toBe(200);
-    const body = await res.json();
+    const body = (await res.json()) as any;
     expect(body.data).toHaveLength(1);
   });
 
@@ -109,7 +109,7 @@ describe('promptRoutes', () => {
     vi.mocked(promptService.listVersions).mockResolvedValue({
       data: [{ id: 'v1', number: 1 }],
       meta: { limit: 20 },
-    });
+    } as any);
 
     const res = await app.request('/prompts/p1/versions?limit=20', { headers: authHeader() });
     expect(res.status).toBe(200);

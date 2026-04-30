@@ -1,6 +1,6 @@
+import { execSync } from 'node:child_process';
+import { randomUUID } from 'node:crypto';
 import { PrismaClient } from '@prisma/client';
-import { execSync } from 'child_process';
-import { randomUUID } from 'crypto';
 
 export async function createTestDatabase() {
   const testDbName = `test_${randomUUID().replace(/-/g, '_')}`;
@@ -17,7 +17,7 @@ export async function createTestDatabase() {
   });
 
   // Run migrations
-  execSync(`npx prisma migrate deploy`, {
+  execSync('npx prisma migrate deploy', {
     env: { ...process.env, DATABASE_URL: testUrl },
     cwd: process.cwd(),
   });
