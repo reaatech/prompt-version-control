@@ -103,7 +103,7 @@ jobs:
         run: pnpm install --frozen-lockfile --prefer-offline
 
       - name: Check formatting
-        run: biome format --write . && git diff --exit-code
+        run: pnpm exec biome format --write . && git diff --exit-code
 
   # ─────────────────────────────────────────────
   # Lint
@@ -265,6 +265,9 @@ jobs:
       - name: Re-link workspace packages
         run: pnpm install --frozen-lockfile --prefer-offline
 
+      - name: Generate Prisma client
+        run: pnpm db:generate
+
       - name: Download build artifacts
         uses: actions/download-artifact@v4
         with:
@@ -311,6 +314,9 @@ jobs:
 
       - name: Re-link workspace packages
         run: pnpm install --frozen-lockfile --prefer-offline
+
+      - name: Generate Prisma client
+        run: pnpm db:generate
 
       - name: Download build artifacts
         uses: actions/download-artifact@v4
