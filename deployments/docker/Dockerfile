@@ -32,7 +32,7 @@ FROM base AS builder
 COPY . .
 RUN pnpm --filter @reaatech/prompt-version-control-server exec prisma generate
 RUN pnpm build
-RUN pnpm --filter=@reaatech/prompt-version-control-server deploy --prod /app/prod/server
+RUN pnpm --filter=@reaatech/prompt-version-control-server deploy --prod --legacy /app/prod/server
 
 # -----------------------------------------------------------------------------
 # Runtime: minimal image with just the compiled server.

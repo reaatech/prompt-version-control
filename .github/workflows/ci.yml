@@ -99,6 +99,9 @@ jobs:
             */*/node_modules
           key: ${{ runner.os }}-pnpm-${{ hashFiles('pnpm-lock.yaml') }}
 
+      - name: Re-link workspace packages
+        run: pnpm install --frozen-lockfile --prefer-offline
+
       - name: Check formatting
         run: biome format --write . && git diff --exit-code
 
@@ -131,6 +134,9 @@ jobs:
             */*/node_modules
           key: ${{ runner.os }}-pnpm-${{ hashFiles('pnpm-lock.yaml') }}
 
+      - name: Re-link workspace packages
+        run: pnpm install --frozen-lockfile --prefer-offline
+
       - name: Lint
         run: pnpm lint
 
@@ -162,6 +168,12 @@ jobs:
             node_modules
             */*/node_modules
           key: ${{ runner.os }}-pnpm-${{ hashFiles('pnpm-lock.yaml') }}
+
+      - name: Re-link workspace packages
+        run: pnpm install --frozen-lockfile --prefer-offline
+
+      - name: Generate Prisma client
+        run: pnpm db:generate
 
       - name: Type check
         run: pnpm typecheck
@@ -372,11 +384,11 @@ jobs:
             fi
           }
           check '${{ needs.audit.result }}' 'Security Audit'
-          check '${{ needs.format.result }}' 'Lint'
-          check '${{ needs.lint.result }}' 'Type Check'
-          check '${{ needs.typecheck.result }}' 'Build'
-          check '${{ needs.build.result }}' 'Test'
-          check '${{ needs.test.result }}' 'Coverage'
-          check '${{ needs.coverage.result }}' 'Docker Build'
-          check '${{ needs.docker-build.result }}' 'All Checks'
+          check '${{ needs.format.result }}' 'Code Format'
+          check '${{ needs.lint.result }}' 'Lint'
+          check '${{ needs.typecheck.result }}' 'Type Check'
+          check '${{ needs.build.result }}' 'Build'
+          check '${{ needs.test.result }}' 'Test'
+          check '${{ needs.coverage.result }}' 'Coverage'
+          check '${{ needs.docker-build.result }}' 'Docker Build'
           echo "All checks passed!"
