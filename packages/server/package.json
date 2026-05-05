@@ -45,7 +45,7 @@
     "@hono/zod-validator": "^0.7.6",
     "@prisma/client": "^5.15.0",
     "@reaatech/prompt-version-control-shared": "workspace:*",
-    "hono": "^4.12.15",
+    "hono": "^4.12.17",
     "ioredis": "^5.4.0",
     "pino": "^9.0.0",
     "pino-pretty": "^11.0.0",
