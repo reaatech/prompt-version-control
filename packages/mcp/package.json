@@ -13,7 +13,12 @@
     "url": "https://github.com/reaatech/prompt-version-control/issues"
   },
   "homepage": "https://github.com/reaatech/prompt-version-control/tree/main/packages/mcp#readme",
-  "keywords": ["prompt", "version-control", "mcp", "model-context-protocol"],
+  "keywords": [
+    "prompt",
+    "version-control",
+    "mcp",
+    "model-context-protocol"
+  ],
   "type": "module",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
@@ -26,7 +31,9 @@
       "import": "./dist/index.js"
     }
   },
-  "files": ["dist"],
+  "files": [
+    "dist"
+  ],
   "publishConfig": {
     "access": "public"
   },

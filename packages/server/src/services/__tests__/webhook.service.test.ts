@@ -19,12 +19,13 @@ describe('webhook SSRF guard', () => {
       expect(__test__.isPrivateAddress(addr)).toBe(true);
     });
 
-    it.each([['8.8.8.8'], ['142.250.80.46'], ['2001:4860:4860::8888']])(
-      'accepts public %s',
-      (addr) => {
-        expect(__test__.isPrivateAddress(addr)).toBe(false);
-      },
-    );
+    it.each([
+      ['8.8.8.8'],
+      ['142.250.80.46'],
+      ['2001:4860:4860::8888'],
+    ])('accepts public %s', (addr) => {
+      expect(__test__.isPrivateAddress(addr)).toBe(false);
+    });
   });
 
   describe('assertPublicUrl', () => {
