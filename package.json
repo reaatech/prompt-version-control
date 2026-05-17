@@ -35,7 +35,12 @@
       "@prisma/engines",
       "esbuild",
       "prisma"
-    ]
+    ],
+    "overrides": {
+      "fast-uri": "3.1.2",
+      "hono": "4.12.19",
+      "express-rate-limit": "8.5.2"
+    }
   },
   "scripts": {
     "build": "turbo run build",
