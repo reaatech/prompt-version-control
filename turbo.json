@@ -22,6 +22,9 @@
       "dependsOn": ["^build"]
     },
     "lint": {},
-    "lint:fix": {}
+    "lint:fix": {},
+    "clean": {
+      "cache": false
+    }
   }
 }
