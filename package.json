@@ -46,6 +46,7 @@
   },
   "scripts": {
     "build": "turbo run build",
+    "clean": "turbo run clean && rm -rf .turbo node_modules/.cache",
     "dev": "turbo run dev --parallel",
     "test": "turbo run test",
     "test:coverage": "turbo run test:coverage",

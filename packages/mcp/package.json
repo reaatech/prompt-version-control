@@ -38,7 +38,7 @@
     "dev": "tsx watch src/index.ts",
     "test": "vitest run",
     "test:coverage": "vitest run --coverage",
-    "clean": "rm -rf dist"
+    "clean": "rm -rf dist coverage .turbo *.tsbuildinfo"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.0.0",
