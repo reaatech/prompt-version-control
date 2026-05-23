@@ -2,7 +2,7 @@
 
 [![CI](https://github.com/reaatech/prompt-version-control/actions/workflows/ci.yml/badge.svg)](https://github.com/reaatech/prompt-version-control/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
-[![TypeScript](https://img.shields.io/badge/TypeScript-5.4-blue)](https://www.typescriptlang.org/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.8-blue)](https://www.typescriptlang.org/)
 
 > Git-like versioning for AI prompts with eval-gated promotion.
 
@@ -172,13 +172,13 @@ console.log(prod.content);
 
 - **Runtime**: Node.js 22+ (LTS)
 - **Language**: TypeScript 5.x (strict mode)
-- **Package manager**: pnpm 9.x
+- **Package manager**: pnpm 10.x
 - **Database**: PostgreSQL 16+ with Prisma ORM
 - **Cache**: Redis 7+
 - **API framework**: Hono 4.x
 - **CLI framework**: Clipanion 4.x
 - **MCP server**: @modelcontextprotocol/sdk
-- **Testing**: Vitest 2.x
+- **Testing**: Vitest 3.x
 - **Validation**: Zod 3.x
 - **Logging**: Pino 9.x
 - **Metrics**: Prometheus client
