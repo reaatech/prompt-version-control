@@ -15,6 +15,9 @@
   "homepage": "https://github.com/reaatech/prompt-version-control/tree/main/packages/mcp#readme",
   "keywords": ["prompt", "version-control", "mcp", "model-context-protocol"],
   "type": "module",
+  "engines": {
+    "node": ">=22"
+  },
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "bin": {
@@ -26,7 +29,7 @@
       "import": "./dist/index.js"
     }
   },
-  "files": ["dist"],
+  "files": ["dist", "CHANGELOG.md"],
   "publishConfig": {
     "access": "public"
   },

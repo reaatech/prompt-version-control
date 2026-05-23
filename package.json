@@ -60,7 +60,8 @@
     "db:studio": "pnpm --filter @reaatech/prompt-version-control-server db:studio",
     "changeset": "changeset",
     "version-packages": "changeset version",
-    "release": "turbo run build && changeset publish"
+    "release": "turbo run build && changeset publish",
+    "pack:dry": "pnpm -r --filter=\"./packages/*\" exec npm pack --dry-run"
   },
   "devDependencies": {
     "@biomejs/biome": "^1.9.4",
