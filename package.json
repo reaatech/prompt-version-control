@@ -37,9 +37,11 @@
       "prisma"
     ],
     "overrides": {
+      "brace-expansion": "5.0.6",
       "fast-uri": "3.1.2",
       "hono": "4.12.19",
-      "express-rate-limit": "8.5.2"
+      "express-rate-limit": "8.5.2",
+      "qs": "6.15.2"
     }
   },
   "scripts": {
