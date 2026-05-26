@@ -13,7 +13,12 @@
     "url": "https://github.com/reaatech/prompt-version-control/issues"
   },
   "homepage": "https://github.com/reaatech/prompt-version-control/tree/main/packages/shared#readme",
-  "keywords": ["prompt", "version-control", "types", "schemas"],
+  "keywords": [
+    "prompt",
+    "version-control",
+    "types",
+    "schemas"
+  ],
   "type": "module",
   "sideEffects": false,
   "engines": {
@@ -35,7 +40,10 @@
       "import": "./dist/schemas/index.js"
     }
   },
-  "files": ["dist", "CHANGELOG.md"],
+  "files": [
+    "dist",
+    "CHANGELOG.md"
+  ],
   "publishConfig": {
     "access": "public"
   },

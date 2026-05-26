@@ -13,7 +13,11 @@
     "url": "https://github.com/reaatech/prompt-version-control/issues"
   },
   "homepage": "https://github.com/reaatech/prompt-version-control/tree/main/packages/cli#readme",
-  "keywords": ["prompt", "version-control", "cli"],
+  "keywords": [
+    "prompt",
+    "version-control",
+    "cli"
+  ],
   "type": "module",
   "engines": {
     "node": ">=22"
@@ -29,7 +33,10 @@
       "import": "./dist/index.js"
     }
   },
-  "files": ["dist", "CHANGELOG.md"],
+  "files": [
+    "dist",
+    "CHANGELOG.md"
+  ],
   "publishConfig": {
     "access": "public"
   },

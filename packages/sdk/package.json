@@ -13,7 +13,12 @@
     "url": "https://github.com/reaatech/prompt-version-control/issues"
   },
   "homepage": "https://github.com/reaatech/prompt-version-control/tree/main/packages/sdk#readme",
-  "keywords": ["prompt", "version-control", "sdk", "typescript"],
+  "keywords": [
+    "prompt",
+    "version-control",
+    "sdk",
+    "typescript"
+  ],
   "type": "module",
   "sideEffects": false,
   "engines": {
@@ -27,7 +32,10 @@
       "import": "./dist/index.js"
     }
   },
-  "files": ["dist", "CHANGELOG.md"],
+  "files": [
+    "dist",
+    "CHANGELOG.md"
+  ],
   "publishConfig": {
     "access": "public"
   },

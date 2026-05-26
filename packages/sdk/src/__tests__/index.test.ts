@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { PVCClient, type PromptVersionControlClient } from '../index.js';
+import { type PromptVersionControlClient, PVCClient } from '../index.js';
 
 describe('PromptVersionControlClient', () => {
   let client: PromptVersionControlClient;
