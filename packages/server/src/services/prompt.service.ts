@@ -1,10 +1,10 @@
 import type { Prisma, Prompt, Version } from '@prisma/client';
-import { calculateChecksum } from '@reaatech/prompt-version-control-shared';
 import type {
   CreatePromptInput,
   CreateVersionInput,
   UpdatePromptInput,
 } from '@reaatech/prompt-version-control-shared';
+import { calculateChecksum } from '@reaatech/prompt-version-control-shared';
 import { prisma } from '../db/client.js';
 import { ConflictError, NotFoundError } from '../errors.js';
 import { paginateResult } from '../utils/pagination.js';

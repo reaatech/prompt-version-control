@@ -28,7 +28,6 @@ describe('EvalService', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
-    // biome-ignore lint/performance/noDelete: env var must be absent, not set to string 'undefined'
     delete process.env.EVAL_WEBHOOK_SECRET;
     service = new EvalService();
   });
