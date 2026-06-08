@@ -19,8 +19,11 @@ export const prisma =
   });
 
 if (process.env.NODE_ENV === 'development') {
-  // biome-ignore lint/suspicious/noExplicitAny: Prisma internal event type
-  (prisma as any).$on('query', (e: { query: string; duration: number }) => {
+  (
+    prisma as {
+      $on(event: 'query', callback: (e: { query: string; duration: number }) => void): void;
+    }
+  ).$on('query', (e) => {
     logger.debug({ query: e.query, duration: e.duration }, 'prisma query');
   });
   globalForPrisma.prisma = prisma;

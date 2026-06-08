@@ -30,11 +30,31 @@ vi.mock('@reaatech/prompt-version-control-shared', () => ({
   renderTemplate: vi.fn(),
 }));
 
+type ToolInputSchema = {
+  type: string;
+  properties: Record<string, { type: string }>;
+  required: string[];
+};
+
+type ToolDefinition = {
+  name: string;
+  description: string;
+  inputSchema: ToolInputSchema;
+};
+
+type ListToolsFn = () => Promise<{ tools: ToolDefinition[] }>;
+type CallToolFn = (request: {
+  params: { name: string; arguments: Record<string, unknown> };
+}) => Promise<{ content: Array<{ text: string }> }>;
+
 describe('MCP Server', () => {
-  let serverInstance: any;
+  let serverInstance: {
+    setRequestHandler: ReturnType<typeof vi.fn>;
+    connect: ReturnType<typeof vi.fn>;
+  };
   let clientInstance: { getProduction: ReturnType<typeof vi.fn> };
-  let listToolsHandler: (...args: any[]) => Promise<any>;
-  let callToolHandler: (...args: any[]) => Promise<any>;
+  let listToolsHandler: ListToolsFn;
+  let callToolHandler: CallToolFn;
 
   beforeAll(async () => {
     await import('../index.js');
@@ -43,12 +63,12 @@ describe('MCP Server', () => {
     const handlerCalls = vi.mocked(serverInstance.setRequestHandler).mock.calls;
 
     listToolsHandler = handlerCalls.find(
-      ([schema]: any[]) => schema === ListToolsRequestSchema,
-    )?.[1] as any;
+      ([schema]: unknown[]) => schema === ListToolsRequestSchema,
+    )?.[1] as unknown as ListToolsFn;
 
     callToolHandler = handlerCalls.find(
-      ([schema]: any[]) => schema === CallToolRequestSchema,
-    )?.[1] as any;
+      ([schema]: unknown[]) => schema === CallToolRequestSchema,
+    )?.[1] as unknown as CallToolFn;
 
     clientInstance = vi.mocked(PVCClient).mock.results[0].value;
   });

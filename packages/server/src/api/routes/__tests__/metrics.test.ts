@@ -26,8 +26,10 @@ describe('metricRoutes', () => {
       projectId: 'proj_1',
       project: { id: 'proj_1', name: 'Test' },
       expiresAt: null,
-    } as any);
-    vi.spyOn(prisma.apiKey, 'update').mockResolvedValue({} as any);
+    } as unknown as Awaited<ReturnType<typeof prisma.apiKey.findUnique>>);
+    vi.spyOn(prisma.apiKey, 'update').mockResolvedValue(
+      {} as unknown as Awaited<ReturnType<typeof prisma.apiKey.update>>,
+    );
     app = new Hono();
     app.route('/metrics', metricRoutes);
   });
@@ -43,25 +45,29 @@ describe('metricRoutes', () => {
       }),
     });
     expect(res.status).toBe(201);
-    const body = (await res.json()) as any;
+    const body = (await res.json()) as { ingested: number };
     expect(body.ingested).toBe(2);
   });
 
   it('GET /metrics/versions/:versionId returns metrics', async () => {
-    vi.mocked(metricService.getVersionMetrics).mockResolvedValue([{ id: 'm1' }] as any);
+    vi.mocked(metricService.getVersionMetrics).mockResolvedValue([
+      { id: 'm1' },
+    ] as unknown as Awaited<ReturnType<typeof metricService.getVersionMetrics>>);
 
     const res = await app.request('/metrics/versions/v1?hours=24', { headers: authHeader() });
     expect(res.status).toBe(200);
-    const body = (await res.json()) as any;
+    const body = (await res.json()) as { data: unknown[] };
     expect(body.data).toHaveLength(1);
   });
 
   it('GET /metrics/prompts/:promptId returns metrics', async () => {
-    vi.mocked(metricService.getPromptMetrics).mockResolvedValue([{ id: 'm1' }] as any);
+    vi.mocked(metricService.getPromptMetrics).mockResolvedValue([
+      { id: 'm1' },
+    ] as unknown as Awaited<ReturnType<typeof metricService.getPromptMetrics>>);
 
     const res = await app.request('/metrics/prompts/p1', { headers: authHeader() });
     expect(res.status).toBe(200);
-    const body = (await res.json()) as any;
+    const body = (await res.json()) as { data: unknown[] };
     expect(body.data).toHaveLength(1);
   });
 });

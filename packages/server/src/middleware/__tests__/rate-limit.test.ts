@@ -51,7 +51,7 @@ describe('rateLimit', () => {
       headers: { authorization: 'Bearer key-3' },
     });
     expect(res.status).toBe(429);
-    const body = (await res.json()) as any;
+    const body = (await res.json()) as { error: { code: string } };
     expect(body.error.code).toBe('RATE_LIMIT_EXCEEDED');
   });
 

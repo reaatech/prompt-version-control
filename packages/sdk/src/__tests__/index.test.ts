@@ -18,11 +18,18 @@ describe('PromptVersionControlClient', () => {
   describe('constructor', () => {
     it('should use default options when not provided', () => {
       const defaultClient = new PVCClient({ apiKey: 'key' });
-      expect((defaultClient as any).baseUrl).toBe('http://localhost:3000');
-      expect((defaultClient as any).retries).toBe(3);
-      expect((defaultClient as any).retryDelay).toBe(1000);
-      expect((defaultClient as any).cacheEnabled).toBe(false);
-      expect((defaultClient as any).cacheTtl).toBe(60_000);
+      const priv = defaultClient as unknown as {
+        baseUrl: string;
+        retries: number;
+        retryDelay: number;
+        cacheEnabled: boolean;
+        cacheTtl: number;
+      };
+      expect(priv.baseUrl).toBe('http://localhost:3000');
+      expect(priv.retries).toBe(3);
+      expect(priv.retryDelay).toBe(1000);
+      expect(priv.cacheEnabled).toBe(false);
+      expect(priv.cacheTtl).toBe(60_000);
     });
 
     it('should override default options with custom values', () => {
@@ -34,11 +41,18 @@ describe('PromptVersionControlClient', () => {
         cache: true,
         cacheTtl: 30_000,
       });
-      expect((customClient as any).baseUrl).toBe('http://custom');
-      expect((customClient as any).retries).toBe(5);
-      expect((customClient as any).retryDelay).toBe(200);
-      expect((customClient as any).cacheEnabled).toBe(true);
-      expect((customClient as any).cacheTtl).toBe(30_000);
+      const priv = customClient as unknown as {
+        baseUrl: string;
+        retries: number;
+        retryDelay: number;
+        cacheEnabled: boolean;
+        cacheTtl: number;
+      };
+      expect(priv.baseUrl).toBe('http://custom');
+      expect(priv.retries).toBe(5);
+      expect(priv.retryDelay).toBe(200);
+      expect(priv.cacheEnabled).toBe(true);
+      expect(priv.cacheTtl).toBe(30_000);
     });
   });
 

@@ -27,8 +27,10 @@ describe('deploymentRoutes', () => {
       projectId: 'proj_1',
       project: { id: 'proj_1', name: 'Test' },
       expiresAt: null,
-    } as any);
-    vi.spyOn(prisma.apiKey, 'update').mockResolvedValue({} as any);
+    } as unknown as Awaited<ReturnType<typeof prisma.apiKey.findUnique>>);
+    vi.spyOn(prisma.apiKey, 'update').mockResolvedValue(
+      {} as unknown as Awaited<ReturnType<typeof prisma.apiKey.update>>,
+    );
     app = new Hono();
     app.route('/deployments', deploymentRoutes);
   });
@@ -37,7 +39,7 @@ describe('deploymentRoutes', () => {
     vi.mocked(deploymentService.createDeployment).mockResolvedValue({
       id: 'd1',
       name: 'A/B',
-    } as any);
+    } as unknown as Awaited<ReturnType<typeof deploymentService.createDeployment>>);
 
     const res = await app.request('/deployments', {
       method: 'POST',
@@ -52,11 +54,13 @@ describe('deploymentRoutes', () => {
   });
 
   it('GET /deployments lists deployments', async () => {
-    vi.mocked(deploymentService.listDeployments).mockResolvedValue([{ id: 'd1' }] as any);
+    vi.mocked(deploymentService.listDeployments).mockResolvedValue([
+      { id: 'd1' },
+    ] as unknown as Awaited<ReturnType<typeof deploymentService.listDeployments>>);
 
     const res = await app.request('/deployments', { headers: authHeader() });
     expect(res.status).toBe(200);
-    const body = (await res.json()) as any;
+    const body = (await res.json()) as { data: unknown[] };
     expect(body.data).toHaveLength(1);
   });
 
@@ -67,7 +71,7 @@ describe('deploymentRoutes', () => {
       headers: authHeader(),
     });
     expect(res.status).toBe(200);
-    const body = (await res.json()) as any;
+    const body = (await res.json()) as { versionId: string };
     expect(body.versionId).toBe('v1');
   });
 
@@ -75,7 +79,7 @@ describe('deploymentRoutes', () => {
     vi.mocked(deploymentService.updateStatus).mockResolvedValue({
       id: 'd1',
       status: 'paused',
-    } as any);
+    } as unknown as Awaited<ReturnType<typeof deploymentService.updateStatus>>);
 
     const res = await app.request('/deployments/d1', {
       method: 'PUT',

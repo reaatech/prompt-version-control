@@ -28,7 +28,7 @@ describe('authMiddleware', () => {
   it('should throw UnauthorizedError when authorization header is missing', async () => {
     const res = await app.request('/test');
     expect(res.status).toBe(401);
-    const body = (await res.json()) as any;
+    const body = (await res.json()) as { error: { code: string } };
     expect(body.error.code).toBe('UNAUTHORIZED');
   });
 
@@ -37,7 +37,7 @@ describe('authMiddleware', () => {
       headers: { authorization: 'Basic abc' },
     });
     expect(res.status).toBe(401);
-    const body = (await res.json()) as any;
+    const body = (await res.json()) as { error: { code: string } };
     expect(body.error.code).toBe('UNAUTHORIZED');
   });
 
@@ -48,7 +48,7 @@ describe('authMiddleware', () => {
       headers: { authorization: 'Bearer invalid-key' },
     });
     expect(res.status).toBe(401);
-    const body = (await res.json()) as any;
+    const body = (await res.json()) as { error: { code: string } };
     expect(body.error.code).toBe('UNAUTHORIZED');
   });
 
@@ -69,7 +69,7 @@ describe('authMiddleware', () => {
       headers: { authorization: 'Bearer expired-key' },
     });
     expect(res.status).toBe(401);
-    const body = (await res.json()) as any;
+    const body = (await res.json()) as { error: { message: string } };
     expect(body.error.message).toContain('expired');
   });
 
@@ -86,8 +86,8 @@ describe('authMiddleware', () => {
     } as unknown as Awaited<ReturnType<typeof prisma.apiKey.findUnique>>);
 
     let capturedProjectId: string | undefined;
-    let capturedApiKey: unknown;
-    let capturedProject: unknown;
+    let capturedApiKey: { id: string } | undefined;
+    let capturedProject: { id: string } | undefined;
 
     app = new Hono();
     app.use('/test', authMiddleware);
@@ -105,7 +105,7 @@ describe('authMiddleware', () => {
 
     expect(res.status).toBe(200);
     expect(capturedProjectId).toBe('proj_123');
-    expect((capturedApiKey as { id: string }).id).toBe('key_valid_1');
-    expect((capturedProject as { id: string }).id).toBe('proj_123');
+    expect(capturedApiKey?.id).toBe('key_valid_1');
+    expect(capturedProject?.id).toBe('proj_123');
   });
 });
