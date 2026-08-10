@@ -23,7 +23,9 @@ describe('evaluationRoutes', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
-    vi.spyOn(prisma.apiKey, 'findUnique').mockImplementation((async (args: any) => {
+    vi.spyOn(prisma.apiKey, 'findUnique').mockImplementation((async (args: {
+      where?: { keyHash?: string };
+    }) => {
       const where = args?.where as { keyHash?: string };
       if (where?.keyHash === hashApiKey('test-key')) {
         return {
@@ -31,17 +33,22 @@ describe('evaluationRoutes', () => {
           projectId: 'proj_1',
           project: { id: 'proj_1', name: 'Test' },
           expiresAt: null,
-        };
+        } as unknown as Awaited<ReturnType<typeof prisma.apiKey.findUnique>>;
       }
       return null;
-    }) as never);
-    vi.spyOn(prisma.apiKey, 'update').mockResolvedValue({} as any);
+    }) as unknown as typeof prisma.apiKey.findUnique);
+    vi.spyOn(prisma.apiKey, 'update').mockResolvedValue(
+      {} as unknown as Awaited<ReturnType<typeof prisma.apiKey.update>>,
+    );
     app = new Hono();
     app.route('/evaluations', evaluationRoutes);
   });
 
   it('POST /evaluations/trigger creates an evaluation', async () => {
-    vi.mocked(evalService.trigger).mockResolvedValue({ id: 'e1', status: 'running' } as any);
+    vi.mocked(evalService.trigger).mockResolvedValue({
+      id: 'e1',
+      status: 'running',
+    } as unknown as Awaited<ReturnType<typeof evalService.trigger>>);
 
     const res = await app.request('/evaluations/trigger', {
       method: 'POST',
@@ -53,7 +60,10 @@ describe('evaluationRoutes', () => {
   });
 
   it('POST /evaluations/webhook is public and routes by evaluationId', async () => {
-    vi.mocked(evalService.receiveWebhook).mockResolvedValue({ id: 'e1', status: 'passed' } as any);
+    vi.mocked(evalService.receiveWebhook).mockResolvedValue({
+      id: 'e1',
+      status: 'passed',
+    } as unknown as Awaited<ReturnType<typeof evalService.receiveWebhook>>);
 
     const res = await app.request('/evaluations/webhook?evaluationId=e1', {
       method: 'POST',
@@ -80,11 +90,13 @@ describe('evaluationRoutes', () => {
   });
 
   it('GET /evaluations/versions/:versionId lists evaluations', async () => {
-    vi.mocked(evalService.listByVersion).mockResolvedValue([{ id: 'e1' }] as any);
+    vi.mocked(evalService.listByVersion).mockResolvedValue([{ id: 'e1' }] as unknown as Awaited<
+      ReturnType<typeof evalService.listByVersion>
+    >);
 
     const res = await app.request('/evaluations/versions/v1', { headers: authHeader() });
     expect(res.status).toBe(200);
-    const body = (await res.json()) as any;
+    const body = (await res.json()) as { data: unknown[] };
     expect(body.data).toHaveLength(1);
     expect(evalService.listByVersion).toHaveBeenCalledWith('proj_1', 'v1');
   });
@@ -97,7 +109,7 @@ describe('evaluationRoutes', () => {
 
     const res = await app.request('/evaluations/versions/v1/gate', { headers: authHeader() });
     expect(res.status).toBe(200);
-    const body = (await res.json()) as any;
+    const body = (await res.json()) as { canPromote: boolean };
     expect(body.canPromote).toBe(true);
   });
 });

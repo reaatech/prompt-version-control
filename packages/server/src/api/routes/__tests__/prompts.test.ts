@@ -51,8 +51,10 @@ describe('promptRoutes', () => {
       projectId: 'proj_1',
       project: { id: 'proj_1', name: 'Test' },
       expiresAt: null,
-    } as any);
-    vi.spyOn(prisma.apiKey, 'update').mockResolvedValue({} as any);
+    } as unknown as Awaited<ReturnType<typeof prisma.apiKey.findUnique>>);
+    vi.spyOn(prisma.apiKey, 'update').mockResolvedValue(
+      {} as unknown as Awaited<ReturnType<typeof prisma.apiKey.update>>,
+    );
     app = new Hono();
     app.route('/prompts', promptRoutes);
   });
@@ -61,16 +63,19 @@ describe('promptRoutes', () => {
     vi.mocked(promptService.listPrompts).mockResolvedValue({
       data: [{ id: 'p1', name: 'test' }],
       meta: { limit: 20 },
-    } as any);
+    } as unknown as Awaited<ReturnType<typeof promptService.listPrompts>>);
 
     const res = await app.request('/prompts?limit=20', { headers: authHeader() });
     expect(res.status).toBe(200);
-    const body = (await res.json()) as any;
+    const body = (await res.json()) as { data: unknown[] };
     expect(body.data).toHaveLength(1);
   });
 
   it('POST /prompts creates a prompt', async () => {
-    vi.mocked(promptService.createPrompt).mockResolvedValue({ id: 'p1', name: 'test' } as any);
+    vi.mocked(promptService.createPrompt).mockResolvedValue({
+      id: 'p1',
+      name: 'test',
+    } as unknown as Awaited<ReturnType<typeof promptService.createPrompt>>);
 
     const res = await app.request('/prompts', {
       method: 'POST',
@@ -81,14 +86,20 @@ describe('promptRoutes', () => {
   });
 
   it('GET /prompts/:id gets a prompt', async () => {
-    vi.mocked(promptService.getPrompt).mockResolvedValue({ id: 'p1', name: 'test' } as any);
+    vi.mocked(promptService.getPrompt).mockResolvedValue({
+      id: 'p1',
+      name: 'test',
+    } as unknown as Awaited<ReturnType<typeof promptService.getPrompt>>);
 
     const res = await app.request('/prompts/p1', { headers: authHeader() });
     expect(res.status).toBe(200);
   });
 
   it('PUT /prompts/:id updates a prompt', async () => {
-    vi.mocked(promptService.updatePrompt).mockResolvedValue({ id: 'p1', name: 'updated' } as any);
+    vi.mocked(promptService.updatePrompt).mockResolvedValue({
+      id: 'p1',
+      name: 'updated',
+    } as unknown as Awaited<ReturnType<typeof promptService.updatePrompt>>);
 
     const res = await app.request('/prompts/p1', {
       method: 'PUT',
@@ -99,7 +110,10 @@ describe('promptRoutes', () => {
   });
 
   it('DELETE /prompts/:id archives a prompt', async () => {
-    vi.mocked(promptService.archivePrompt).mockResolvedValue({ id: 'p1', archived: true } as any);
+    vi.mocked(promptService.archivePrompt).mockResolvedValue({
+      id: 'p1',
+      archived: true,
+    } as unknown as Awaited<ReturnType<typeof promptService.archivePrompt>>);
 
     const res = await app.request('/prompts/p1', { method: 'DELETE', headers: authHeader() });
     expect(res.status).toBe(200);
@@ -109,14 +123,17 @@ describe('promptRoutes', () => {
     vi.mocked(promptService.listVersions).mockResolvedValue({
       data: [{ id: 'v1', number: 1 }],
       meta: { limit: 20 },
-    } as any);
+    } as unknown as Awaited<ReturnType<typeof promptService.listVersions>>);
 
     const res = await app.request('/prompts/p1/versions?limit=20', { headers: authHeader() });
     expect(res.status).toBe(200);
   });
 
   it('POST /prompts/:id/versions creates a version', async () => {
-    vi.mocked(promptService.createVersion).mockResolvedValue({ id: 'v1', number: 2 } as any);
+    vi.mocked(promptService.createVersion).mockResolvedValue({
+      id: 'v1',
+      number: 2,
+    } as unknown as Awaited<ReturnType<typeof promptService.createVersion>>);
 
     const res = await app.request('/prompts/p1/versions', {
       method: 'POST',
@@ -127,14 +144,20 @@ describe('promptRoutes', () => {
   });
 
   it('GET /prompts/:id/production gets production version', async () => {
-    vi.mocked(tagService.getProductionVersion).mockResolvedValue({ id: 'v1', number: 2 } as any);
+    vi.mocked(tagService.getProductionVersion).mockResolvedValue({
+      id: 'v1',
+      number: 2,
+    } as unknown as Awaited<ReturnType<typeof tagService.getProductionVersion>>);
 
     const res = await app.request('/prompts/p1/production', { headers: authHeader() });
     expect(res.status).toBe(200);
   });
 
   it('GET /prompts/:id/diff returns diff', async () => {
-    vi.mocked(diffEngine.diff).mockResolvedValue({ impact: 'minor', sections: [] } as any);
+    vi.mocked(diffEngine.diff).mockResolvedValue({
+      impact: 'minor',
+      sections: [],
+    } as unknown as Awaited<ReturnType<typeof diffEngine.diff>>);
 
     const res = await app.request('/prompts/p1/diff?fromVersion=1&toVersion=2', {
       headers: authHeader(),

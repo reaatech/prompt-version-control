@@ -1,3 +1,4 @@
+import type { BaseContext } from 'clipanion';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { InitCommand } from '../../commands/init.js';
 
@@ -15,7 +16,7 @@ describe('InitCommand', () => {
     vi.clearAllMocks();
     stdout = { write: vi.fn() };
     command = new InitCommand();
-    command.context = { stdout } as any;
+    command.context = { stdout } as unknown as BaseContext;
   });
 
   it('should save config with provided api-url and api-key', async () => {
@@ -34,8 +35,8 @@ describe('InitCommand', () => {
   });
 
   it('should require --api-key to be provided', async () => {
-    command.apiUrl = undefined as any;
-    command.apiKey = undefined as any;
+    command.apiUrl = undefined;
+    command.apiKey = undefined;
 
     const result = await command.execute();
 

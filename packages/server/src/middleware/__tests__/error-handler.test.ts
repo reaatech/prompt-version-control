@@ -40,7 +40,9 @@ describe('errorHandler', () => {
 
     const res = await app.request('/zod');
     expect(res.status).toBe(400);
-    const body = (await res.json()) as any;
+    const body = (await res.json()) as {
+      error: { code: string; details: { fields: Record<string, string[]> } };
+    };
     expect(body.error.code).toBe('VALIDATION_ERROR');
     expect(body.error.details.fields).toEqual({
       name: ['Required'],
@@ -55,7 +57,7 @@ describe('errorHandler', () => {
 
     const res = await app.request('/notfound');
     expect(res.status).toBe(404);
-    const body = (await res.json()) as any;
+    const body = (await res.json()) as { error: { code: string; message: string } };
     expect(body.error.code).toBe('NOT_FOUND');
     expect(body.error.message).toContain('Prompt with id 123 not found');
   });
@@ -67,7 +69,7 @@ describe('errorHandler', () => {
 
     const res = await app.request('/unknown');
     expect(res.status).toBe(500);
-    const body = (await res.json()) as any;
+    const body = (await res.json()) as { error: { code: string; message: string } };
     expect(body.error.code).toBe('INTERNAL_ERROR');
     expect(body.error.message).toBe('Internal server error');
   });
